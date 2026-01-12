@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import {
   ClassConstructor,
   DtoValidationError,
@@ -31,6 +32,7 @@ export class JsonRpcResponse {
  * Type-safe JSON-RPC handler that validates params against registered DTOs.
  * When a DTO is provided, params are validated and transformed before being passed to the handler.
  */
+@Injectable()
 export class JsonRpcHandler {
   private methods: Record<string, RpcMethodDefinition> = {};
 

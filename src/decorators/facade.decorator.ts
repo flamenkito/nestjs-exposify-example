@@ -31,22 +31,3 @@ export function isFacade(target: Constructor): boolean {
 export function getFacadeRegistry(): Constructor[] {
   return facadeRegistry;
 }
-
-/**
- * Scan all facade classes and log their names and method names
- */
-export function scanFacades(): void {
-  console.log('[Facade] Scanning registered facades...');
-
-  for (const facade of facadeRegistry) {
-    const prototype = facade.prototype as Record<string, unknown>;
-    const methodNames = Object.getOwnPropertyNames(prototype).filter(
-      (name) => name !== 'constructor' && typeof prototype[name] === 'function',
-    );
-
-    console.log(`[Facade] ${facade.name}`);
-    console.log(`  Methods: ${methodNames.join(', ') || '(none)'}`);
-  }
-
-  console.log(`[Facade] Total facades: ${facadeRegistry.length}`);
-}

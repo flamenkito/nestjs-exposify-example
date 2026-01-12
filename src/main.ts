@@ -1,7 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { scanFacades } from './decorators/facade.decorator';
+import { JsonRpcHandler } from './common/json-rpc-handler';
+import { registerFacadeRpcMethods } from './common/rpc-registry';
 
 /**
  * Bootstrap function that initializes and starts the NestJS application.
@@ -17,8 +18,9 @@ async function bootstrap() {
   // Invalid requests will receive a 400 Bad Request response with validation errors.
   app.useGlobalPipes(new ValidationPipe());
 
-  // Scan and log all @Facade decorated classes and their methods.
-  scanFacades();
+  // Auto-register @RpcMethod decorated methods from @Facade classes.
+  const rpcHandler = app.get(JsonRpcHandler);
+  registerFacadeRpcMethods(app, rpcHandler);
 
   // Start the HTTP server and listen for incoming requests.
   // Uses PORT environment variable if set, otherwise defaults to port 3000.

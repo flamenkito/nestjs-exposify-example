@@ -20,7 +20,7 @@ export class UsersService {
 
   async getUserById(id: string): Promise<UserDto> {
     const user =
-      users.find(byId(id)) || required(`user with id ${id}`, NotFoundException);
+      users.find(byId(id)) ?? required(`user with id ${id}`, NotFoundException);
     return Promise.resolve(user);
   }
 
