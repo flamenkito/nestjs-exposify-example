@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { JsonRpcErrorCode } from './json-rpc.error-codes';
 import {
   ClassConstructor,
   DtoValidationError,
   validateDto,
-} from '../shared/validate-dto';
-import { JsonRpcErrorCode } from './json-rpc.error-codes';
+} from './validate-dto';
 
 interface RpcMethodDefinition {
   paramsDto?: ClassConstructor<object>;

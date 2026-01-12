@@ -1,16 +1,16 @@
 import { INestApplication } from '@nestjs/common';
-import { getJsonRpcRegistry } from './json-rpc.decorator';
+import { getExposeRegistry } from './expose.decorator';
 import { JsonRpcHandler } from './json-rpc.handler';
 
 /**
- * Scans all @JsonRpc classes and registers all their methods as RPC endpoints.
+ * Scans all @Expose({ transport: 'json-rpc' }) classes and registers their methods as RPC endpoints.
  * RPC method names follow the pattern: {ClassName}.{methodName}
  */
 export function registerJsonRpcMethods(
   app: INestApplication,
   handler: JsonRpcHandler,
 ): void {
-  const rpcClasses = getJsonRpcRegistry();
+  const rpcClasses = getExposeRegistry('json-rpc');
 
   for (const rpcClass of rpcClasses) {
     // Get the instance from NestJS DI container
@@ -34,7 +34,7 @@ export function registerJsonRpcMethods(
 
       handler.register(rpcName, undefined, boundMethod);
 
-      console.log(`[RPC] Registered ${rpcName}`);
+      console.log(`[JSON-RPC] Registered ${rpcName}`);
     }
   }
 }

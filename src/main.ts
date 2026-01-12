@@ -1,7 +1,7 @@
+import { JsonRpcHandler, registerJsonRpcMethods } from '@app/json-rpc';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { JsonRpcHandler, registerJsonRpcMethods } from './json-rpc';
 
 /**
  * Bootstrap function that initializes and starts the NestJS application.

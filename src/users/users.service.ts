@@ -1,6 +1,6 @@
+import { Expose } from '@app/json-rpc';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { JsonRpc } from '../json-rpc';
 import { byId, required } from '../shared';
 import { CreateUserDto, UserDto } from './user.dto';
 
@@ -10,7 +10,7 @@ const users: UserDto[] = [
   { id: uuidv4(), name: 'Bob Johnson', email: 'bob@example.com' },
 ];
 
-@JsonRpc()
+@Expose({ transport: 'json-rpc' })
 @Injectable()
 export class UsersService {
   async getUsers(): Promise<UserDto[]> {

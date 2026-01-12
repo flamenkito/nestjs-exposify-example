@@ -1,7 +1,7 @@
+import { JsonRpcModule } from '@app/json-rpc';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { JsonRpcModule } from './json-rpc';
 import { UsersModule } from './users';
 
 @Module({
