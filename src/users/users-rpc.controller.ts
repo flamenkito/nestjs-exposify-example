@@ -20,7 +20,7 @@ interface JsonRpcResponse {
   id: string | number | null;
 }
 
-@Controller('api/rpc/users')
+@Controller('rpc/v1/users')
 export class UsersRpcController {
   constructor(private readonly usersService: UsersService) {}
 

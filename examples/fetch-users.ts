@@ -1,5 +1,5 @@
 const fetchUsers = async () => {
-  const response = await fetch('http://localhost:3000/api/rpc/users', {
+  const response = await fetch('http://localhost:3000/rpc/v1/users', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
