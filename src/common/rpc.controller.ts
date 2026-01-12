@@ -3,11 +3,11 @@ import {
   JsonRpcHandler,
   JsonRpcRequest,
   JsonRpcResponse,
-} from '../common/json-rpc-handler';
+} from './json-rpc-handler';
 
 @Controller('rpc/v1')
-export class UsersRpcController {
-  constructor(public readonly rpcHandler: JsonRpcHandler) {}
+export class RpcController {
+  constructor(private readonly rpcHandler: JsonRpcHandler) {}
 
   @Post()
   async handleRpc(@Body() request: JsonRpcRequest): Promise<JsonRpcResponse> {
