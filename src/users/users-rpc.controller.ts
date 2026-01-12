@@ -1,77 +1,37 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { JsonRpcErrorCode } from '../common/json-rpc-error-codes';
-import { DtoValidationError, validateDto } from '../utils/validate-dto';
-import { CreateUserDto, UserDto } from './interfaces/user.interface';
+import { Body, Controller, OnModuleInit, Post } from '@nestjs/common';
+import { IsString } from 'class-validator';
+import {
+  JsonRpcHandler,
+  JsonRpcRequest,
+  JsonRpcResponse,
+} from '../common/json-rpc-handler';
+import { CreateUserDto } from './interfaces/user.interface';
 import { UsersService } from './users.service';
 
-interface JsonRpcRequest {
-  jsonrpc: '2.0';
-  method: string;
-  params?: Record<string, unknown>;
-  id: string | number;
-}
-
-interface JsonRpcResponse {
-  jsonrpc: '2.0';
-  result?: unknown;
-  error?: {
-    code: number;
-    message: string;
-  };
-  id: string | number | null;
+class GetUserByIdParams {
+  @IsString()
+  id: string;
 }
 
 @Controller('rpc/v1/users')
-export class UsersRpcController {
+export class UsersRpcController implements OnModuleInit {
+  private rpcHandler = new JsonRpcHandler();
+
   constructor(private readonly usersService: UsersService) {}
+
+  onModuleInit() {
+    this.rpcHandler
+      .register('getUsers', undefined, () => this.usersService.getUsers())
+      .register('getUserById', GetUserByIdParams, (params) =>
+        this.usersService.getUserById(params.id),
+      )
+      .register('createUser', CreateUserDto, (dto) =>
+        this.usersService.createUser(dto),
+      );
+  }
 
   @Post()
   async handleRpc(@Body() request: JsonRpcRequest): Promise<JsonRpcResponse> {
-    console.log({ request });
-    try {
-      const result = await this.executeMethod(request.method, request.params);
-      return {
-        jsonrpc: '2.0',
-        result,
-        id: request.id,
-      };
-    } catch (error) {
-      if (error instanceof DtoValidationError) {
-        return {
-          jsonrpc: '2.0',
-          error: {
-            code: JsonRpcErrorCode.INVALID_PARAMS,
-            message: error.message,
-          },
-          id: request.id,
-        };
-      }
-      return {
-        jsonrpc: '2.0',
-        error: {
-          code: JsonRpcErrorCode.INTERNAL_ERROR,
-          message: error instanceof Error ? error.message : 'Internal error',
-        },
-        id: request.id,
-      };
-    }
-  }
-
-  private async executeMethod(
-    method: string,
-    params?: Record<string, unknown>,
-  ): Promise<UserDto | UserDto[]> {
-    switch (method) {
-      case 'getUsers':
-        return this.usersService.getUsers();
-      case 'getUserById':
-        return this.usersService.getUserById(params?.id as string);
-      case 'createUser': {
-        const dto = await validateDto(CreateUserDto, params);
-        return this.usersService.createUser(dto);
-      }
-      default:
-        throw new Error(`Method ${method} not found`);
-    }
+    return this.rpcHandler.handle(request);
   }
 }

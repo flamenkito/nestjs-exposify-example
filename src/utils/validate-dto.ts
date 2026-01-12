@@ -1,7 +1,7 @@
 import { plainToInstance } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 
-type ClassConstructor<T> = new () => T;
+export type ClassConstructor<T> = new () => T;
 
 export class DtoValidationError extends Error {
   constructor(public readonly errors: ValidationError[]) {
