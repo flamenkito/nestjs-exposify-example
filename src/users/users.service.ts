@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Facade } from '../decorators/facade.decorator';
-import { byId } from '../utils/by-id';
-import { required } from '../utils/required';
-import { CreateUserDto, UserDto } from './interfaces/user.interface';
+import { JsonRpc } from '../json-rpc';
+import { byId, required } from '../shared';
+import { CreateUserDto, UserDto } from './user.dto';
 
 const users: UserDto[] = [
   { id: uuidv4(), name: 'John Doe', email: 'john@example.com' },
@@ -11,7 +10,7 @@ const users: UserDto[] = [
   { id: uuidv4(), name: 'Bob Johnson', email: 'bob@example.com' },
 ];
 
-@Facade()
+@JsonRpc()
 @Injectable()
 export class UsersService {
   async getUsers(): Promise<UserDto[]> {

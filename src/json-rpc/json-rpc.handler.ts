@@ -3,8 +3,8 @@ import {
   ClassConstructor,
   DtoValidationError,
   validateDto,
-} from '../utils/validate-dto';
-import { JsonRpcErrorCode } from './json-rpc-error-codes';
+} from '../shared/validate-dto';
+import { JsonRpcErrorCode } from './json-rpc.error-codes';
 
 interface RpcMethodDefinition {
   paramsDto?: ClassConstructor<object>;

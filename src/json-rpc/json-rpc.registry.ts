@@ -1,23 +1,23 @@
 import { INestApplication } from '@nestjs/common';
-import { getFacadeRegistry } from '../decorators/facade.decorator';
-import { JsonRpcHandler } from './json-rpc-handler';
+import { getJsonRpcRegistry } from './json-rpc.decorator';
+import { JsonRpcHandler } from './json-rpc.handler';
 
 /**
- * Scans all @Facade classes and registers all their methods as RPC endpoints.
+ * Scans all @JsonRpc classes and registers all their methods as RPC endpoints.
  * RPC method names follow the pattern: {ClassName}.{methodName}
  */
-export function registerFacadeRpcMethods(
+export function registerJsonRpcMethods(
   app: INestApplication,
   handler: JsonRpcHandler,
 ): void {
-  const facades = getFacadeRegistry();
+  const rpcClasses = getJsonRpcRegistry();
 
-  for (const facadeClass of facades) {
+  for (const rpcClass of rpcClasses) {
     // Get the instance from NestJS DI container
-    const instance = app.get(facadeClass, { strict: false });
+    const instance = app.get(rpcClass, { strict: false });
     if (!instance) continue;
 
-    const prototype = facadeClass.prototype as Record<string, unknown>;
+    const prototype = rpcClass.prototype as Record<string, unknown>;
     const methodNames = Object.getOwnPropertyNames(prototype).filter(
       (name) => name !== 'constructor' && typeof prototype[name] === 'function',
     );
@@ -30,7 +30,7 @@ export function registerFacadeRpcMethods(
         params: unknown,
       ) => Promise<unknown>;
 
-      const rpcName = `${facadeClass.name}.${methodName}`;
+      const rpcName = `${rpcClass.name}.${methodName}`;
 
       handler.register(rpcName, undefined, boundMethod);
 

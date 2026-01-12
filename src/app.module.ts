@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RpcModule } from './common/rpc.module';
-import { UsersModule } from './users/users.module';
+import { JsonRpcModule } from './json-rpc';
+import { UsersModule } from './users';
 
 @Module({
-  imports: [UsersModule, RpcModule],
+  imports: [UsersModule, JsonRpcModule],
   controllers: [AppController],
   providers: [AppService],
 })

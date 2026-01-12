@@ -3,10 +3,10 @@ import {
   JsonRpcHandler,
   JsonRpcRequest,
   JsonRpcResponse,
-} from './json-rpc-handler';
+} from './json-rpc.handler';
 
 @Controller('rpc/v1')
-export class RpcController {
+export class JsonRpcController {
   constructor(private readonly rpcHandler: JsonRpcHandler) {}
 
   @Post()
