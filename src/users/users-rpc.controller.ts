@@ -1,4 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
+import { JsonRpcErrorCode } from '../common/json-rpc-error-codes';
 import { CreateUserDto, UserDto } from './interfaces/user.interface';
 import { UsersService } from './users.service';
 
@@ -37,7 +38,7 @@ export class UsersRpcController {
       return {
         jsonrpc: '2.0',
         error: {
-          code: -32603,
+          code: JsonRpcErrorCode.INTERNAL_ERROR,
           message: error instanceof Error ? error.message : 'Internal error',
         },
         id: request.id,
