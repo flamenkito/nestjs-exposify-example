@@ -1,10 +1,10 @@
 {
-  "name": "nest-app",
+  "name": "nestjs-exposify-example",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "description": "Example NestJS application demonstrating nestjs-exposify library usage",
+  "author": "asutov@outlook.com",
+  "private": false,
+  "license": "Unlicense",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -25,6 +25,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
+    "nestjs-exposify": "^0.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "uuid": "^13.0.0"

@@ -6,16 +6,5 @@
     "deleteOutDir": true,
     "webpack": false,
     "tsConfigPath": "tsconfig.json"
-  },
-  "projects": {
-    "nestjs-exposify": {
-      "type": "library",
-      "root": "libs/nestjs-exposify",
-      "entryFile": "index",
-      "sourceRoot": "libs/nestjs-exposify/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/nestjs-exposify/tsconfig.lib.json"
-      }
-    }
   }
 }
