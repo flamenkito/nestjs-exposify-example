@@ -1,31 +1,23 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-
-const users = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', email: 'bob@example.com' },
-];
+import { CreateUserDto, UserDto } from './interfaces/user.interface';
+import { UsersService } from './users.service';
 
 @Controller('api/users')
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
   @Get()
-  getUsers() {
-    return users;
+  getUsers(): UserDto[] {
+    return this.usersService.getUsers();
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string) {
-    return users.find((user) => user.id === parseInt(id));
+  getUserById(@Param('id') id: string): UserDto | undefined {
+    return this.usersService.getUserById(parseInt(id));
   }
 
   @Post()
-  createUser(@Body() body: { name: string; email: string }) {
-    const newUser = {
-      id: users.length + 1,
-      name: body.name,
-      email: body.email,
-    };
-    users.push(newUser);
-    return newUser;
+  createUser(@Body() dto: CreateUserDto): UserDto {
+    return this.usersService.createUser(dto);
   }
 }
