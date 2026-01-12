@@ -13,7 +13,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserById(@Param('id', ParseUuidPipe) id: string): Promise<UserDto | undefined> {
+  async getUserById(@Param('id', ParseUuidPipe) id: string): Promise<UserDto> {
     return this.usersService.getUserById(id);
   }
 

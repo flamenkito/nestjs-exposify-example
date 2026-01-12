@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { byId } from '../utils/by-id';
 import { CreateUserDto, UserDto } from './interfaces/user.interface';
@@ -15,8 +15,12 @@ export class UsersService {
     return Promise.resolve(users);
   }
 
-  async getUserById(id: string): Promise<UserDto | undefined> {
-    return Promise.resolve(users.find(byId(id)));
+  async getUserById(id: string): Promise<UserDto> {
+    const user = users.find(byId(id));
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    return user;
   }
 
   async createUser(dto: CreateUserDto): Promise<UserDto> {
