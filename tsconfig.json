@@ -22,8 +22,8 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/json-rpc": ["libs/json-rpc/src"],
-      "@app/json-rpc/*": ["libs/json-rpc/src/*"]
+      "nestjs-exposify": ["libs/nestjs-exposify/src"],
+      "nestjs-exposify/*": ["libs/nestjs-exposify/src/*"]
     }
   }
 }

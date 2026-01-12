@@ -8,13 +8,13 @@
     "tsConfigPath": "tsconfig.json"
   },
   "projects": {
-    "json-rpc": {
+    "nestjs-exposify": {
       "type": "library",
-      "root": "libs/json-rpc",
+      "root": "libs/nestjs-exposify",
       "entryFile": "index",
-      "sourceRoot": "libs/json-rpc/src",
+      "sourceRoot": "libs/nestjs-exposify/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/json-rpc/tsconfig.lib.json"
+        "tsConfigPath": "libs/nestjs-exposify/tsconfig.lib.json"
       }
     }
   }

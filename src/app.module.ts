@@ -1,4 +1,4 @@
-import { JsonRpcModule } from '@app/json-rpc';
+import { JsonRpcModule } from 'nestjs-exposify';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
