@@ -2,31 +2,33 @@ import 'reflect-metadata';
 
 const FACADE_METADATA_KEY = Symbol('facade');
 
+type Constructor = new (...args: unknown[]) => object;
+
 // Registry to store all facade classes
-const facadeRegistry: Function[] = [];
+const facadeRegistry: Constructor[] = [];
 
 /**
  * Class decorator that marks a class as a Facade.
  * All facade classes can be discovered and their methods logged on app startup.
  */
 export function Facade(): ClassDecorator {
-  return (target: Function) => {
+  return (target) => {
     Reflect.defineMetadata(FACADE_METADATA_KEY, true, target);
-    facadeRegistry.push(target);
+    facadeRegistry.push(target as unknown as Constructor);
   };
 }
 
 /**
  * Check if a class is decorated with @Facade
  */
-export function isFacade(target: Function): boolean {
+export function isFacade(target: Constructor): boolean {
   return Reflect.getMetadata(FACADE_METADATA_KEY, target) === true;
 }
 
 /**
  * Get all registered facade classes
  */
-export function getFacadeRegistry(): Function[] {
+export function getFacadeRegistry(): Constructor[] {
   return facadeRegistry;
 }
 
@@ -37,10 +39,9 @@ export function scanFacades(): void {
   console.log('[Facade] Scanning registered facades...');
 
   for (const facade of facadeRegistry) {
-    const methodNames = Object.getOwnPropertyNames(facade.prototype).filter(
-      (name) =>
-        name !== 'constructor' &&
-        typeof facade.prototype[name] === 'function',
+    const prototype = facade.prototype as Record<string, unknown>;
+    const methodNames = Object.getOwnPropertyNames(prototype).filter(
+      (name) => name !== 'constructor' && typeof prototype[name] === 'function',
     );
 
     console.log(`[Facade] ${facade.name}`);
