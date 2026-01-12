@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { byId } from '../utils/by-id';
+import { required } from '../utils/required';
 import { CreateUserDto, UserDto } from './interfaces/user.interface';
 
 const users: UserDto[] = [
@@ -16,11 +17,9 @@ export class UsersService {
   }
 
   async getUserById(id: string): Promise<UserDto> {
-    const user = users.find(byId(id));
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-    return user;
+    const user =
+      users.find(byId(id)) || required(`user with id ${id}`, NotFoundException);
+    return Promise.resolve(user);
   }
 
   async createUser(dto: CreateUserDto): Promise<UserDto> {
