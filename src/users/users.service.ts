@@ -7,23 +7,27 @@ const users: UserDto[] = [
   { id: 3, name: 'Bob Johnson', email: 'bob@example.com' },
 ];
 
+const byId = <T extends { id: unknown }>(id: unknown) => {
+  return (it: T) => it.id === id;
+};
+
 @Injectable()
 export class UsersService {
-  getUsers(): UserDto[] {
-    return users;
+  async getUsers(): Promise<UserDto[]> {
+    return Promise.resolve(users);
   }
 
-  getUserById(id: number): UserDto | undefined {
-    return users.find((user) => user.id === id);
+  async getUserById(id: number): Promise<UserDto | undefined> {
+    return Promise.resolve(users.find(byId(id)));
   }
 
-  createUser(dto: CreateUserDto): UserDto {
+  async createUser(dto: CreateUserDto): Promise<UserDto> {
     const newUser: UserDto = {
       id: users.length + 1,
       name: dto.name,
       email: dto.email,
     };
     users.push(newUser);
-    return newUser;
+    return Promise.resolve(newUser);
   }
 }
