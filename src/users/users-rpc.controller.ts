@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { JsonRpcErrorCode } from '../common/json-rpc-error-codes';
+import { DtoValidationError, validateDto } from '../utils/validate-dto';
 import { CreateUserDto, UserDto } from './interfaces/user.interface';
 import { UsersService } from './users.service';
 
@@ -35,6 +36,16 @@ export class UsersRpcController {
         id: request.id,
       };
     } catch (error) {
+      if (error instanceof DtoValidationError) {
+        return {
+          jsonrpc: '2.0',
+          error: {
+            code: JsonRpcErrorCode.INVALID_PARAMS,
+            message: error.message,
+          },
+          id: request.id,
+        };
+      }
       return {
         jsonrpc: '2.0',
         error: {
@@ -55,8 +66,10 @@ export class UsersRpcController {
         return this.usersService.getUsers();
       case 'getUserById':
         return this.usersService.getUserById(params?.id as string);
-      case 'createUser':
-        return this.usersService.createUser(params as unknown as CreateUserDto);
+      case 'createUser': {
+        const dto = await validateDto(CreateUserDto, params);
+        return this.usersService.createUser(dto);
+      }
       default:
         throw new Error(`Method ${method} not found`);
     }
