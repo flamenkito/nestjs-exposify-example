@@ -6,7 +6,8 @@
   "private": true,
   "license": "Unlicense",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libs/*"
   ],
   "scripts": {
     "dev:api": "npm run dev -w @example/api",

@@ -23,14 +23,3 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 }
-
-export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  user: AuthUser;
-}

@@ -6,7 +6,7 @@ Example NestJS application demonstrating [nestjs-exposify](https://github.com/tk
 
 ## Description
 
-This project shows how to use the `nestjs-exposify` library to expose NestJS services via JSON-RPC transport using the `@Expose` decorator. Includes a Preact UI that consumes the JSON-RPC API.
+This project shows how to use the `nestjs-exposify` library to expose NestJS services via JSON-RPC transport using the `@Expose` decorator. Includes a reusable JWT authentication library with permission-based access control (RBAC) and a Preact UI that consumes the JSON-RPC API.
 
 ## Installation
 
@@ -35,23 +35,68 @@ npm run start:prod
 
 Open http://localhost:3000 - NestJS serves both API and UI.
 
+## Authentication
+
+JWT-based authentication with role permissions provided by `@example/auth` library.
+
+### Test Users
+
+| Email | Password | Role | Permissions |
+|-------|----------|------|-------------|
+| admin@example.com | password | admin | user:create, user:read, user:update, user:delete |
+| user@example.com | password | user | user:read |
+
+### Login
+
+```bash
+curl -X POST http://localhost:3000/rpc/v1 \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"AuthService.login","params":{"email":"admin@example.com","password":"password"},"id":1}'
+```
+
+Response:
+```json
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "accessToken": "eyJhbG...",
+    "user": { "id": "...", "name": "Admin", "email": "admin@example.com", "role": "admin" }
+  },
+  "id": 1
+}
+```
+
+### Using the Token
+
+```bash
+TOKEN="eyJhbG..."
+
+curl -X POST http://localhost:3000/rpc/v1 \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"jsonrpc":"2.0","method":"UsersService.getUsers","id":1}'
+```
+
 ## Testing the JSON-RPC endpoint
 
 ```bash
-# Get all users
-curl -X POST http://localhost:3000/rpc/v1 \
+# Login and get token
+TOKEN=$(curl -s http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc": "2.0", "method": "UsersService.getUsers", "id": 1}'
+  -d '{"jsonrpc":"2.0","method":"AuthService.login","params":{"email":"admin@example.com","password":"password"},"id":1}' \
+  | grep -o '"accessToken":"[^"]*"' | cut -d'"' -f4)
 
-# Get user by ID
+# Get all users (requires user:read)
 curl -X POST http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc": "2.0", "method": "UsersService.getUserById", "params": "user-uuid-here", "id": 2}'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"jsonrpc":"2.0","method":"UsersService.getUsers","id":1}'
 
-# Create user
+# Create user (requires user:create - admin only)
 curl -X POST http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc": "2.0", "method": "UsersService.createUser", "params": {"name": "Alice", "email": "alice@example.com"}, "id": 3}'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"jsonrpc":"2.0","method":"UsersService.createUser","params":{"name":"Alice","email":"alice@example.com"},"id":2}'
 ```
 
 ## Project Structure
@@ -60,10 +105,8 @@ curl -X POST http://localhost:3000/rpc/v1 \
 ├── apps/
 │   ├── api/                    # NestJS backend
 │   │   ├── src/
+│   │   │   ├── auth/           # App-specific auth (service, DTOs)
 │   │   │   ├── users/
-│   │   │   │   ├── users.module.ts
-│   │   │   │   ├── users.service.ts
-│   │   │   │   └── user.dto.ts
 │   │   │   ├── shared/
 │   │   │   ├── app.module.ts
 │   │   │   └── main.ts
@@ -71,48 +114,100 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │   └── web/                    # Preact frontend
 │       ├── src/
 │       │   ├── components/
-│       │   │   ├── UserList.tsx
-│       │   │   ├── UserForm.tsx
-│       │   │   └── UserCard.tsx
 │       │   ├── hooks/
-│       │   │   └── useJsonRpc.ts
 │       │   ├── App.tsx
 │       │   └── index.tsx
 │       ├── vite.config.ts
 │       └── package.json
+├── libs/
+│   └── auth/                   # Reusable auth library
+│       ├── src/
+│       │   ├── auth.module.ts      # AuthModule.forRoot()
+│       │   ├── auth.guard.ts       # JwtAuthGuard
+│       │   ├── auth.dto.ts         # AuthUser, AuthResponse, JwtPayload
+│       │   ├── public.decorator.ts # @Public()
+│       │   ├── permissions.decorator.ts # @Permissions(), Role, Permission
+│       │   └── index.ts
+│       └── package.json
 └── package.json                # Workspace root
 ```
 
-## Key Files
+## Auth Library (`@example/auth`)
 
-### `apps/api/src/users/users.service.ts`
+Reusable NestJS authentication library with JWT and permission-based RBAC. Supports fully typed custom roles and permissions.
+
+### Setup with Typed Config
+
+1. Define your app's roles and permissions (`auth.config.ts`):
 
 ```typescript
-import { Expose } from 'nestjs-exposify';
-import { Injectable } from '@nestjs/common';
+import { createPermissionsDecorator } from '@example/auth';
 
-@Expose({ transport: 'json-rpc' })
+// Define your roles
+export type Role = 'admin' | 'user';
+
+// Define your permissions
+export type Permission = 'user:create' | 'user:read' | 'user:update' | 'user:delete';
+
+// Role-to-permissions mapping (fully typed)
+export const ROLE_PERMISSIONS = {
+  admin: ['user:create', 'user:read', 'user:update', 'user:delete'],
+  user: ['user:read'],
+} as const satisfies Record<Role, readonly Permission[]>;
+
+// Create typed Permissions decorator
+export const Permissions = createPermissionsDecorator<Permission>();
+```
+
+2. Configure the module:
+
+```typescript
+import { AuthModule } from '@example/auth';
+import { ROLE_PERMISSIONS } from './auth.config';
+
+@Module({
+  imports: [
+    AuthModule.forRoot({
+      secret: process.env.JWT_SECRET || 'your-secret',
+      expiresIn: '1d',
+      rolePermissions: ROLE_PERMISSIONS,  // Typed!
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+### Decorators
+
+```typescript
+import { Public } from '@example/auth';
+import { Permissions } from './auth.config';  // Use typed decorator
+
 @Injectable()
-export class UsersService {
-  async getUsers(): Promise<UserDto[]> { ... }
-  async getUserById(id: string): Promise<UserDto> { ... }
-  async createUser(dto: CreateUserDto): Promise<UserDto> { ... }
+export class MyService {
+  @Public()  // No auth required
+  async publicMethod() { ... }
+
+  @Permissions('user:read')  // TypeScript enforces valid permission
+  async protectedMethod() { ... }
+
+  @Permissions('user:read', 'user:update')  // Requires ALL permissions
+  async multiPermMethod() { ... }
+
+  @Permissions('invalid:perm')  // TS Error: not assignable to Permission
+  async invalidMethod() { ... }
 }
 ```
 
-### `apps/web/src/hooks/useJsonRpc.ts`
+### Generic Types
 
 ```typescript
-async function jsonRpcCall<T>(method: string, params?: unknown): Promise<T> {
-  const response = await fetch('/rpc/v1', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', method, params, id: Date.now() }),
-  });
-  const data = await response.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.result;
-}
+import { AuthUser, AuthResponse, JwtPayload } from '@example/auth';
+import { Role } from './auth.config';
+
+// Types are generic - pass your Role type
+const user: AuthUser<Role> = { id: '...', name: '...', email: '...', role: 'admin' };
+const response: AuthResponse<Role> = { accessToken: '...', user };
 ```
 
 ## License

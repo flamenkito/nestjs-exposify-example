@@ -1,6 +1,7 @@
 import { Expose } from 'nestjs-exposify';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { Permissions } from '../auth';
 import { byId, required } from '../shared';
 import { CreateUserDto, UserDto } from './user.dto';
 
@@ -13,16 +14,19 @@ const users: UserDto[] = [
 @Expose({ transport: 'json-rpc' })
 @Injectable()
 export class UsersService {
+  @Permissions('user:read')
   async getUsers(): Promise<UserDto[]> {
     return Promise.resolve(users);
   }
 
+  @Permissions('user:read')
   async getUserById(id: string): Promise<UserDto> {
     const user =
       users.find(byId(id)) ?? required(`user with id ${id}`, NotFoundException);
     return Promise.resolve(user);
   }
 
+  @Permissions('user:create')
   async createUser(dto: CreateUserDto): Promise<UserDto> {
     const newUser: UserDto = {
       id: uuidv4(),

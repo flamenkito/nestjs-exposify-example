@@ -1,21 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { AuthResponse, AuthUser, Public } from '@example/auth';
 import * as bcrypt from 'bcrypt';
 import { Expose } from 'nestjs-exposify';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  AuthResponse,
-  AuthUser,
-  LoginDto,
-  RegisterDto,
-} from './auth.dto';
-import { Public } from './public.decorator';
+import { Role } from './auth.config';
+import { LoginDto, RegisterDto } from './auth.dto';
 
 interface StoredUser {
   id: string;
   name: string;
   email: string;
   passwordHash: string;
+  role: Role;
 }
 
 // In-memory user storage
@@ -26,6 +23,15 @@ const users: StoredUser[] = [
     email: 'admin@example.com',
     // Password: "password"
     passwordHash: '$2b$10$1mt58fwdDw3YvdWY5c.z0OhPjr2IrVS1LeNythMesdeY3lmUmSt/y',
+    role: 'admin',
+  },
+  {
+    id: uuidv4(),
+    name: 'User',
+    email: 'user@example.com',
+    // Password: "password"
+    passwordHash: '$2b$10$1mt58fwdDw3YvdWY5c.z0OhPjr2IrVS1LeNythMesdeY3lmUmSt/y',
+    role: 'user',
   },
 ];
 
@@ -35,7 +41,7 @@ export class AuthService {
   constructor(private jwtService: JwtService) {}
 
   @Public()
-  async login(dto: LoginDto): Promise<AuthResponse> {
+  async login(dto: LoginDto): Promise<AuthResponse<Role>> {
     const user = users.find((u) => u.email === dto.email);
 
     if (!user) {
@@ -48,7 +54,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const payload = { sub: user.id, email: user.email, name: user.name };
+    const payload = { sub: user.id, email: user.email, name: user.name, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
@@ -57,12 +63,13 @@ export class AuthService {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     };
   }
 
   @Public()
-  async register(dto: RegisterDto): Promise<AuthResponse> {
+  async register(dto: RegisterDto): Promise<AuthResponse<Role>> {
     const existingUser = users.find((u) => u.email === dto.email);
 
     if (existingUser) {
@@ -75,11 +82,12 @@ export class AuthService {
       name: dto.name,
       email: dto.email,
       passwordHash,
+      role: 'user',
     };
 
     users.push(newUser);
 
-    const payload = { sub: newUser.id, email: newUser.email, name: newUser.name };
+    const payload = { sub: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role };
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
@@ -88,11 +96,12 @@ export class AuthService {
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,
+        role: newUser.role,
       },
     };
   }
 
-  async me(user: AuthUser): Promise<AuthUser> {
+  async me(user: AuthUser<Role>): Promise<AuthUser<Role>> {
     return user;
   }
 }

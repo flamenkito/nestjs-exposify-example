@@ -1,25 +1,17 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtModule } from '@nestjs/jwt';
+import { AuthModule as AuthLibModule } from '@example/auth';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './auth.guard';
+import { ROLE_PERMISSIONS } from './auth.config';
 
 @Module({
   imports: [
-    JwtModule.register({
-      global: true,
+    AuthLibModule.forRoot({
       secret: process.env.JWT_SECRET || 'super-secret-key-change-in-production',
-      signOptions: { expiresIn: '1d' },
+      expiresIn: '1d',
+      rolePermissions: ROLE_PERMISSIONS,
     }),
   ],
-  providers: [
-    AuthService,
-    JwtAuthGuard,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
-  exports: [AuthService, JwtAuthGuard],
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}
