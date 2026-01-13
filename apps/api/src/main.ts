@@ -1,6 +1,6 @@
-import { JsonRpcHandler, registerJsonRpcMethods } from 'nestjs-exposify';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { JsonRpcHandler, registerJsonRpcMethods } from 'nestjs-exposify';
 import { AppModule } from './app.module';
 
 /**
@@ -11,6 +11,11 @@ async function bootstrap() {
   // Create a new NestJS application instance using the root AppModule.
   // The AppModule contains all the configuration, controllers, and providers.
   const app = await NestFactory.create(AppModule);
+
+  // Enable CORS for frontend development (Vite dev server on port 3001)
+  app.enableCors({
+    origin: 'http://localhost:3001',
+  });
 
   // Enable global validation pipe to automatically validate incoming request payloads.
   // This uses class-validator decorators defined in DTO classes to validate data.

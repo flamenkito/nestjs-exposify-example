@@ -1,7 +1,10 @@
 # compiled output
-/dist
-/node_modules
-/build
+dist
+node_modules
+build
+
+# built frontend
+apps/api/public
 
 # Logs
 logs
