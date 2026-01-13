@@ -8,7 +8,8 @@ import {
   AuthUser,
   LoginDto,
   RegisterDto,
-} from './auth.dto.js';
+} from './auth.dto';
+import { Public } from './public.decorator';
 
 interface StoredUser {
   id: string;
@@ -33,6 +34,7 @@ const users: StoredUser[] = [
 export class AuthService {
   constructor(private jwtService: JwtService) {}
 
+  @Public()
   async login(dto: LoginDto): Promise<AuthResponse> {
     const user = users.find((u) => u.email === dto.email);
 
@@ -59,6 +61,7 @@ export class AuthService {
     };
   }
 
+  @Public()
   async register(dto: RegisterDto): Promise<AuthResponse> {
     const existingUser = users.find((u) => u.email === dto.email);
 

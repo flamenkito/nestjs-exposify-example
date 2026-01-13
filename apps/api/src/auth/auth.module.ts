@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from './auth.service.js';
-import { JwtAuthGuard } from './auth.guard.js';
+import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './auth.guard';
 
 @Module({
   imports: [

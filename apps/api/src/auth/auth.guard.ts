@@ -6,9 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-
-// Methods that don't require authentication
-const PUBLIC_METHODS = ['AuthService.login', 'AuthService.register'];
+import { PUBLIC_METHODS } from './public.decorator';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -19,7 +17,7 @@ export class JwtAuthGuard implements CanActivate {
 
     // Check if this is a JSON-RPC request with a public method
     const body = request.body;
-    if (body?.method && PUBLIC_METHODS.includes(body.method)) {
+    if (body?.method && PUBLIC_METHODS.has(body.method)) {
       return true;
     }
 
