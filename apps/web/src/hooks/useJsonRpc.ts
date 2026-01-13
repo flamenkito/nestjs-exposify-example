@@ -1,4 +1,4 @@
-import { signal } from '@preact/signals';
+import { signal, computed } from '@preact/signals';
 import type { CreateUserDto, User } from '../types/user';
 
 interface JsonRpcRequest {
@@ -19,7 +19,25 @@ interface JsonRpcResponse<T> {
   id: number;
 }
 
+interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface AuthResponse {
+  accessToken: string;
+  user: AuthUser;
+}
+
 let requestId = 0;
+
+// Auth state
+export const token = signal<string | null>(localStorage.getItem('token'));
+export const currentUser = signal<AuthUser | null>(
+  JSON.parse(localStorage.getItem('user') || 'null')
+);
+export const isAuthenticated = computed(() => !!token.value);
 
 async function jsonRpcCall<T>(method: string, params?: unknown): Promise<T> {
   const request: JsonRpcRequest = {
@@ -29,9 +47,17 @@ async function jsonRpcCall<T>(method: string, params?: unknown): Promise<T> {
     id: ++requestId,
   };
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token.value) {
+    headers['Authorization'] = `Bearer ${token.value}`;
+  }
+
   const response = await fetch('/rpc/v1', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(request),
   });
 
@@ -44,7 +70,37 @@ async function jsonRpcCall<T>(method: string, params?: unknown): Promise<T> {
   return data.result as T;
 }
 
-// Signals for state management
+// Auth functions
+export async function login(email: string, password: string): Promise<boolean> {
+  loading.value = true;
+  error.value = null;
+  try {
+    const result = await jsonRpcCall<AuthResponse>('AuthService.login', {
+      email,
+      password,
+    });
+    token.value = result.accessToken;
+    currentUser.value = result.user;
+    localStorage.setItem('token', result.accessToken);
+    localStorage.setItem('user', JSON.stringify(result.user));
+    return true;
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Login failed';
+    return false;
+  } finally {
+    loading.value = false;
+  }
+}
+
+export function logout(): void {
+  token.value = null;
+  currentUser.value = null;
+  users.value = [];
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+}
+
+// Users state
 export const users = signal<User[]>([]);
 export const loading = signal(false);
 export const error = signal<string | null>(null);

@@ -1,16 +1,38 @@
 import { useEffect } from 'preact/hooks';
 import { UserList } from './components/UserList';
 import { UserForm } from './components/UserForm';
-import { fetchUsers, error, loading } from './hooks/useJsonRpc';
+import { LoginForm } from './components/LoginForm';
+import {
+  fetchUsers,
+  error,
+  loading,
+  isAuthenticated,
+  currentUser,
+  logout,
+} from './hooks/useJsonRpc';
 
 export function App() {
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (isAuthenticated.value) {
+      fetchUsers();
+    }
+  }, [isAuthenticated.value]);
+
+  if (!isAuthenticated.value) {
+    return <LoginForm />;
+  }
 
   return (
     <div class="container">
-      <h1>Users</h1>
+      <header class="header">
+        <h1>Users</h1>
+        <div class="user-info">
+          <span>Welcome, {currentUser.value?.name}</span>
+          <button class="secondary" onClick={logout}>
+            Logout
+          </button>
+        </div>
+      </header>
 
       {error.value && <div class="error">{error.value}</div>}
 
