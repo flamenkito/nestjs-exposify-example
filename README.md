@@ -6,9 +6,9 @@
   [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 </div>
 
-Example NestJS application demonstrating [nestjs-exposify](https://github.com/tks2a/nestjs-exposify) library usage with Preact and Angular frontends. Includes:
+Example NestJS application demonstrating [nestjs-exposify](https://github.com/flamenkito/nestjs-exposify) library usage with Preact and Angular frontends. Includes:
 - Reusable JWT authentication library with permission-based RBAC
-- Client generation via [exposify-codegen](https://github.com/tks2a/exposify-codegen)
+- Client generation via [exposify-codegen](https://github.com/flamenkito/exposify-codegen)
 - Preact UI that consumes the JSON-RPC API
 - Angular 21 UI (zoneless, signal forms) that consumes the JSON-RPC API
 
@@ -22,20 +22,19 @@ npm install
 
 ### Development
 
-Use [workgraph](https://github.com/tks2a/workgraph) for coordinated builds with file watching:
+Use [workgraph](https://github.com/flamenkito/workgraph) for coordinated builds with file watching:
 
 ```bash
-# Watch libs + run API and Angular dev servers
-npm run dev -- api web-angular
-
-# Watch libs + run API and Preact dev servers
-npm run dev -- api web-preact
-
-# Watch libs only
 npm run dev
 ```
 
-- http://localhost:3001 - Preact UI (hot reload)
+This will:
+1. Build library dependencies (`@example/auth`, `@example/utils`)
+2. Generate typed clients for Angular and Preact via [exposify-codegen](https://github.com/flamenkito/exposify-codegen)
+3. Start all dev servers with hot reload
+
+- http://localhost:3000 - API
+- http://localhost:3001/preact/ - Preact UI (hot reload)
 - http://localhost:3002 - Angular UI (hot reload)
 
 ### Production
@@ -127,6 +126,7 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │   ├── web-preact/             # Preact frontend
 │   │   ├── src/
 │   │   │   ├── components/
+│   │   │   ├── generated/      # Auto-generated (exposify-codegen)
 │   │   │   ├── hooks/
 │   │   │   ├── App.tsx
 │   │   │   └── index.tsx
@@ -137,8 +137,8 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │       │   ├── app/
 │       │   │   ├── components/
 │       │   │   ├── services/
-│       │   │   ├── models/
 │       │   │   └── app.component.ts
+│       │   ├── generated/      # Auto-generated (exposify-codegen)
 │       │   ├── main.ts
 │       │   └── styles.css
 │       ├── angular.json
@@ -242,45 +242,58 @@ const response: AuthResponse<Role> = { accessToken: '...', user };
 
 ## Client Generation (exposify-codegen)
 
-This project uses [exposify-codegen](https://github.com/tks2a/exposify-codegen) to generate typed clients from NestJS `@Expose` decorated services. Client generation is **automatic** via [workgraph](https://github.com/tks2a/workgraph) source configuration.
+This project uses [exposify-codegen](https://github.com/flamenkito/exposify-codegen) to generate typed clients from NestJS `@Expose` decorated services. Client generation is **automatic** via [workgraph](https://github.com/flamenkito/workgraph) source configuration.
 
 ### Automatic Generation
 
-The `workgraph.sources` configuration in `package.json` automatically regenerates the Angular client when building:
+The `workgraph.sources` configuration in `package.json` automatically regenerates clients when the API changes:
 
 ```json
 {
   "workgraph": {
     "sources": {
-      "apps/web-angular/src/generated": "npx exposify-codegen api -o ./apps/web-angular/src/generated"
+      "apps/web-angular/src/generated": {
+        "command": "npx exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
+        "deps": ["api"]
+      },
+      "apps/web-preact/src/generated": {
+        "command": "npx exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
+        "deps": ["api"]
+      }
     }
   }
 }
 ```
 
-When you run `npm run build` or `npm run dev`, workgraph detects that `web-angular` imports from `src/generated` and automatically runs the exposify-codegen command before building.
+When you run `npm run build` or `npm run dev`, workgraph builds dependencies first, then runs the codegen commands before starting the dev servers.
 
 ### Manual Generation
 
 You can also generate manually:
 
 ```bash
-npx exposify-codegen api -o ./apps/web-angular/src/generated
+# Angular client
+npx exposify-codegen api -t angular -o ./apps/web-angular/src/generated
+
+# Preact client
+npx exposify-codegen api -t preact -o ./apps/web-preact/src/generated
 ```
 
 ### Generated Output
 
+**Angular** (`apps/web-angular/src/generated/`):
 ```
-apps/web-angular/src/generated/
-├── json-rpc.client.ts      # JSON-RPC client
-├── services/
-│   ├── auth-service.service.ts
-│   ├── users-service.service.ts
-│   └── index.ts
-├── models/
-│   ├── user-dto.ts
-│   ├── login-dto.ts
-│   └── index.ts
+├── json-rpc.client.ts      # HttpClient-based JSON-RPC client
+├── services/               # Injectable Angular services
+├── models/                 # TypeScript interfaces
+└── index.ts
+```
+
+**Preact** (`apps/web-preact/src/generated/`):
+```
+├── json-rpc.client.ts      # Fetch-based JSON-RPC client
+├── services/               # Async functions returning Promise<T>
+├── models/                 # TypeScript interfaces
 └── index.ts
 ```
 
@@ -304,7 +317,7 @@ const userId = params.id ?? required('userId', NotFoundException);
 
 ## Build Orchestration
 
-This project uses [workgraph](https://github.com/tks2a/workgraph) for dependency-aware builds in watch mode.
+This project uses [workgraph](https://github.com/flamenkito/workgraph) for dependency-aware builds in watch mode.
 
 ```bash
 # Install workgraph globally (optional)
