@@ -1,12 +1,12 @@
-# nestjs-exposify-example
+<div align="center">
+  <img src="docs/assets/logo_icon_transparent_1024.png" alt="nestjs-exposify Logo" width="128">
+  <h1>nestjs-exposify-example</h1>
+  <p><strong>Example monorepo demonstrating nestjs-exposify</strong></p>
 
-Example NestJS application demonstrating [nestjs-exposify](https://github.com/tks2a/nestjs-exposify) library usage with Preact and Angular frontends.
+  [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+</div>
 
-[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
-
-## Description
-
-This project shows how to use the `nestjs-exposify` library to expose NestJS services via JSON-RPC transport using the `@Expose` decorator. Includes:
+Example NestJS application demonstrating [nestjs-exposify](https://github.com/tks2a/nestjs-exposify) library usage with Preact and Angular frontends. Includes:
 - Reusable JWT authentication library with permission-based RBAC
 - Client generation via [exposify-codegen](https://github.com/tks2a/exposify-codegen)
 - Preact UI that consumes the JSON-RPC API
@@ -242,32 +242,36 @@ const response: AuthResponse<Role> = { accessToken: '...', user };
 
 ## Client Generation (exposify-codegen)
 
-This project uses [exposify-codegen](https://github.com/tks2a/exposify-codegen) to generate typed clients from NestJS `@Expose` decorated services.
+This project uses [exposify-codegen](https://github.com/tks2a/exposify-codegen) to generate typed clients from NestJS `@Expose` decorated services. Client generation is **automatic** via [workgraph](https://github.com/tks2a/workgraph) source configuration.
 
-### Usage
+### Automatic Generation
 
-```bash
-# Generate Angular client
-npm run generate:client
+The `workgraph.sources` configuration in `package.json` automatically regenerates the Angular client when building:
 
-# Or use exposify-codegen directly with workspace project names
-exposify-codegen api auth -o ./generated
-exposify-codegen api -t angular
+```json
+{
+  "workgraph": {
+    "sources": {
+      "apps/web-angular/src/generated": "npx exposify-codegen api -o ./apps/web-angular/src/generated"
+    }
+  }
+}
 ```
 
-### CLI Options
+When you run `npm run build` or `npm run dev`, workgraph detects that `web-angular` imports from `src/generated` and automatically runs the exposify-codegen command before building.
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `<projects...>` | Workspace project names to scan | (required) |
-| `-o, --output <path>` | Output directory | `.` (current dir) |
-| `-e, --endpoint <path>` | JSON-RPC endpoint | `/rpc/v1` |
-| `-t, --target <target>` | Target framework (angular, react, fetch) | `angular` |
+### Manual Generation
+
+You can also generate manually:
+
+```bash
+npx exposify-codegen api -o ./apps/web-angular/src/generated
+```
 
 ### Generated Output
 
 ```
-generated/
+apps/web-angular/src/generated/
 ├── json-rpc.client.ts      # JSON-RPC client
 ├── services/
 │   ├── auth-service.service.ts
