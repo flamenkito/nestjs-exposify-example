@@ -1,4 +1,5 @@
 import { signal, computed } from '@preact/signals';
+import { byId } from '@example/utils';
 import { setAuthToken } from '../generated';
 import {
   login as apiLogin,
@@ -91,7 +92,7 @@ export async function updateUser(id: string, name: string, email: string): Promi
   error.value = null;
   try {
     const updatedUser = await apiUpdateUser({ id, name, email });
-    users.value = users.value.map((u) => (u.id === updatedUser.id ? updatedUser : u));
+    users.value = users.value.map((u) => (byId(updatedUser.id)(u) ? updatedUser : u));
     return updatedUser;
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to update user';
@@ -106,7 +107,7 @@ export async function deleteUser(id: string): Promise<boolean> {
   error.value = null;
   try {
     await apiDeleteUser({ id });
-    users.value = users.value.filter((u) => u.id !== id);
+    users.value = users.value.filter((u) => !byId(id)(u));
     selectedUser.value = null;
     return true;
   } catch (e) {

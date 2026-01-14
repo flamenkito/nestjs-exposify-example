@@ -78,6 +78,7 @@ export class AppComponent {
   showCreateForm = signal(false);
 
   usersResource = resource({
+    params: () => (this.auth.isAuthenticated() ? {} : undefined),
     loader: () => firstValueFrom(this.usersService.getUsers()),
   });
 

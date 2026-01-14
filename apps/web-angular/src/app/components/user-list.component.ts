@@ -1,4 +1,5 @@
 import { Component, input, output, signal, effect, inject } from '@angular/core';
+import { byId } from '@example/utils';
 import { UserDto, UsersService } from '../../generated';
 import { UserCardComponent } from './user-card.component';
 import { UserFormComponent } from './user-form.component';
@@ -29,7 +30,7 @@ import { UserFormComponent } from './user-form.component';
             } @else {
               @for (user of users(); track user.id) {
                 <tr
-                  [class.selected]="selectedUser()?.id === user.id"
+                  [class.selected]="isSelected(user)"
                   (click)="selectUser(user)">
                   <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
@@ -73,8 +74,13 @@ export class UserListComponent {
     });
   }
 
+  isSelected(user: UserDto): boolean {
+    const selected = this.selectedUser();
+    return selected !== null && byId(selected.id)(user);
+  }
+
   selectUser(user: UserDto) {
-    if (this.selectedUser()?.id === user.id) {
+    if (this.isSelected(user)) {
       this.selectedUser.set(null);
     } else {
       this.selectedUser.set(user);

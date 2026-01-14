@@ -1,2 +1,2 @@
-export * from './by-id';
-export * from './required';
+export * from './by-id.js';
+export * from './required.js';

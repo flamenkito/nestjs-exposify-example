@@ -7,6 +7,7 @@
     "build": "ng build"
   },
   "dependencies": {
+    "@example/utils": "*",
     "@angular/common": "^21.0.0",
     "@angular/compiler": "^21.0.0",
     "@angular/core": "^21.0.0",
