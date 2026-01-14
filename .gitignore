@@ -6,6 +6,9 @@ build
 # built frontend
 apps/api/public
 
+# generated client
+generated
+
 # Logs
 logs
 *.log

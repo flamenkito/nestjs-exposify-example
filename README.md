@@ -6,7 +6,10 @@ Example NestJS application demonstrating [nestjs-exposify](https://github.com/tk
 
 ## Description
 
-This project shows how to use the `nestjs-exposify` library to expose NestJS services via JSON-RPC transport using the `@Expose` decorator. Includes a reusable JWT authentication library with permission-based access control (RBAC) and a Preact UI that consumes the JSON-RPC API.
+This project shows how to use the `nestjs-exposify` library to expose NestJS services via JSON-RPC transport using the `@Expose` decorator. Includes:
+- Reusable JWT authentication library with permission-based RBAC
+- Angular client generator (ts-morph AST parsing)
+- Preact UI that consumes the JSON-RPC API
 
 ## Installation
 
@@ -120,14 +123,21 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │       ├── vite.config.ts
 │       └── package.json
 ├── libs/
-│   └── auth/                   # Reusable auth library
+│   ├── auth/                   # Reusable auth library
+│   │   ├── src/
+│   │   │   ├── auth.module.ts      # AuthModule.forRoot()
+│   │   │   ├── auth.guard.ts       # JwtAuthGuard
+│   │   │   ├── auth.dto.ts         # AuthUser, AuthResponse, JwtPayload
+│   │   │   ├── public.decorator.ts # @Public()
+│   │   │   ├── permissions.decorator.ts # @Permissions()
+│   │   │   └── index.ts
+│   │   └── package.json
+│   └── client-gen/             # Angular client generator
 │       ├── src/
-│       │   ├── auth.module.ts      # AuthModule.forRoot()
-│       │   ├── auth.guard.ts       # JwtAuthGuard
-│       │   ├── auth.dto.ts         # AuthUser, AuthResponse, JwtPayload
-│       │   ├── public.decorator.ts # @Public()
-│       │   ├── permissions.decorator.ts # @Permissions(), Role, Permission
-│       │   └── index.ts
+│       │   ├── cli.ts              # CLI entry point
+│       │   ├── parser.ts           # ts-morph AST parsing
+│       │   ├── generator.ts        # Code generation
+│       │   └── templates/          # Output templates
 │       └── package.json
 └── package.json                # Workspace root
 ```
@@ -208,6 +218,102 @@ import { Role } from './auth.config';
 // Types are generic - pass your Role type
 const user: AuthUser<Role> = { id: '...', name: '...', email: '...', role: 'admin' };
 const response: AuthResponse<Role> = { accessToken: '...', user };
+```
+
+## Client Generator (`@example/client-gen`)
+
+Generate Angular HTTP clients from NestJS services decorated with `@Expose({ transport: 'json-rpc' })`.
+
+### Usage
+
+```bash
+# Build the generator
+npm run build:client-gen
+
+# Generate Angular client
+npm run generate:client
+
+# Or use CLI directly
+npx @example/client-gen -i ./apps/api/src -o ./generated -e /rpc/v1
+```
+
+### CLI Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-i, --input <path>` | Source directory to scan | (required) |
+| `-o, --output <path>` | Output directory | (required) |
+| `-e, --endpoint <path>` | JSON-RPC endpoint | `/rpc/v1` |
+
+### Generated Output
+
+```
+generated/
+├── json-rpc.client.ts      # Base JSON-RPC client
+├── services/
+│   ├── auth-service.service.ts
+│   ├── users-service.service.ts
+│   └── index.ts
+├── models/
+│   ├── user-dto.ts
+│   ├── login-dto.ts
+│   └── index.ts
+└── index.ts
+```
+
+### Example
+
+**Input (NestJS):**
+```typescript
+@Expose({ transport: 'json-rpc' })
+@Injectable()
+export class UsersService {
+  @Permissions('user:read')
+  async getUsers(): Promise<UserDto[]> { ... }
+
+  @Permissions('user:create')
+  async createUser(dto: CreateUserDto): Promise<UserDto> { ... }
+}
+```
+
+**Output (Angular):**
+```typescript
+@Injectable({ providedIn: 'root' })
+export class UsersService {
+  constructor(private rpc: JsonRpcClient) {}
+
+  getUsers(): Observable<UserDto[]> {
+    return this.rpc.call<UserDto[]>('UsersService.getUsers');
+  }
+
+  createUser(dto: CreateUserDto): Observable<UserDto> {
+    return this.rpc.call<UserDto>('UsersService.createUser', dto);
+  }
+}
+```
+
+### Using in Angular
+
+```typescript
+// app.module.ts
+import { HttpClientModule } from '@angular/common/http';
+
+@NgModule({
+  imports: [HttpClientModule],
+})
+export class AppModule {}
+
+// component.ts
+import { UsersService } from './generated';
+
+@Component({ ... })
+export class MyComponent {
+  constructor(private users: UsersService) {}
+
+  loadUsers() {
+    this.users.getUsers().subscribe(users => console.log(users));
+  }
+}
 ```
 
 ## License
