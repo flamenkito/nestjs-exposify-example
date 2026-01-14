@@ -134,7 +134,7 @@ export async function createUser(dto: CreateUserDto): Promise<User | null> {
 
 export async function getUserById(id: string): Promise<User | null> {
   try {
-    return await jsonRpcCall<User>('UsersService.getUserById', id);
+    return await jsonRpcCall<User>('UsersService.getUserById', { id });
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Failed to fetch user';
     return null;

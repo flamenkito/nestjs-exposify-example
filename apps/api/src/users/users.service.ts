@@ -1,9 +1,9 @@
 import { Expose } from 'nestjs-exposify';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { byId, required } from '@example/utils';
 import { Permissions } from '../auth';
-import { byId, required } from '../shared';
-import { CreateUserDto, UserDto } from './user.dto';
+import { CreateUserDto, IdDto, UserDto } from './user.dto';
 
 const users: UserDto[] = [
   { id: uuidv4(), name: 'John Doe', email: 'john@example.com' },
@@ -20,9 +20,9 @@ export class UsersService {
   }
 
   @Permissions('user:read')
-  async getUserById(id: string): Promise<UserDto> {
+  async getUserById(dto: IdDto): Promise<UserDto> {
     const user =
-      users.find(byId(id)) ?? required(`user with id ${id}`, NotFoundException);
+      users.find(byId(dto.id)) ?? required(`user with id ${dto.id}`, NotFoundException);
     return Promise.resolve(user);
   }
 

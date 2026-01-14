@@ -8,7 +8,7 @@ Example NestJS application demonstrating [nestjs-exposify](https://github.com/tk
 
 This project shows how to use the `nestjs-exposify` library to expose NestJS services via JSON-RPC transport using the `@Expose` decorator. Includes:
 - Reusable JWT authentication library with permission-based RBAC
-- Angular client generator (ts-morph AST parsing)
+- Client generation via [exposify-codegen](https://github.com/tks2a/exposify-codegen)
 - Preact UI that consumes the JSON-RPC API
 - Angular 21 UI (zoneless, signal forms) that consumes the JSON-RPC API
 
@@ -20,19 +20,23 @@ npm install
 
 ## Running the app
 
+### Development
+
+Use [workgraph](https://github.com/tks2a/workgraph) for coordinated builds with file watching:
+
 ```bash
-# Backend (Terminal 1)
-npm run dev:api
+# Watch libs + run API and Angular dev servers
+npm run dev -- api web-angular
 
-# Preact Frontend (Terminal 2)
-npm run dev:web
+# Watch libs + run API and Preact dev servers
+npm run dev -- api web-preact
 
-# Angular Frontend (Terminal 2 - alternative)
-npm run dev:web-angular
+# Watch libs only
+npm run dev
 ```
 
-Open http://localhost:3001 for the Preact UI with hot reload.
-Open http://localhost:3002 for the Angular UI with hot reload.
+- http://localhost:3001 - Preact UI (hot reload)
+- http://localhost:3002 - Angular UI (hot reload)
 
 ### Production
 
@@ -149,12 +153,11 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │   │   │   ├── permissions.decorator.ts # @Permissions()
 │   │   │   └── index.ts
 │   │   └── package.json
-│   └── client-gen/             # Angular client generator
+│   └── utils/                  # Shared utilities
 │       ├── src/
-│       │   ├── cli.ts              # CLI entry point
-│       │   ├── parser.ts           # ts-morph AST parsing
-│       │   ├── generator.ts        # Code generation
-│       │   └── templates/          # Output templates
+│       │   ├── by-id.ts            # byId predicate helper
+│       │   ├── required.ts         # required() assertion helper
+│       │   └── index.ts
 │       └── package.json
 └── package.json                # Workspace root
 ```
@@ -237,36 +240,35 @@ const user: AuthUser<Role> = { id: '...', name: '...', email: '...', role: 'admi
 const response: AuthResponse<Role> = { accessToken: '...', user };
 ```
 
-## Client Generator (`@example/client-gen`)
+## Client Generation (exposify-codegen)
 
-Generate Angular HTTP clients from NestJS services decorated with `@Expose({ transport: 'json-rpc' })`.
+This project uses [exposify-codegen](https://github.com/tks2a/exposify-codegen) to generate typed clients from NestJS `@Expose` decorated services.
 
 ### Usage
 
 ```bash
-# Build the generator
-npm run build:client-gen
-
 # Generate Angular client
 npm run generate:client
 
-# Or use CLI directly
-npx @example/client-gen -i ./apps/api/src -o ./generated -e /rpc/v1
+# Or use exposify-codegen directly with workspace project names
+exposify-codegen api auth -o ./generated
+exposify-codegen api -t angular
 ```
 
 ### CLI Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-i, --input <path>` | Source directory to scan | (required) |
-| `-o, --output <path>` | Output directory | (required) |
+| `<projects...>` | Workspace project names to scan | (required) |
+| `-o, --output <path>` | Output directory | `.` (current dir) |
 | `-e, --endpoint <path>` | JSON-RPC endpoint | `/rpc/v1` |
+| `-t, --target <target>` | Target framework (angular, react, fetch) | `angular` |
 
 ### Generated Output
 
 ```
 generated/
-├── json-rpc.client.ts      # Base JSON-RPC client
+├── json-rpc.client.ts      # JSON-RPC client
 ├── services/
 │   ├── auth-service.service.ts
 │   ├── users-service.service.ts
@@ -278,60 +280,42 @@ generated/
 └── index.ts
 ```
 
-### Example
+## Utils Library (`@example/utils`)
 
-**Input (NestJS):**
-```typescript
-@Expose({ transport: 'json-rpc' })
-@Injectable()
-export class UsersService {
-  @Permissions('user:read')
-  async getUsers(): Promise<UserDto[]> { ... }
+Shared utility functions used across the monorepo.
 
-  @Permissions('user:create')
-  async createUser(dto: CreateUserDto): Promise<UserDto> { ... }
-}
-```
-
-**Output (Angular):**
-```typescript
-@Injectable({ providedIn: 'root' })
-export class UsersService {
-  constructor(private rpc: JsonRpcClient) {}
-
-  getUsers(): Observable<UserDto[]> {
-    return this.rpc.call<UserDto[]>('UsersService.getUsers');
-  }
-
-  createUser(dto: CreateUserDto): Observable<UserDto> {
-    return this.rpc.call<UserDto>('UsersService.createUser', dto);
-  }
-}
-```
-
-### Using in Angular
+### Functions
 
 ```typescript
-// app.module.ts
-import { HttpClientModule } from '@angular/common/http';
+import { byId, required } from '@example/utils';
 
-@NgModule({
-  imports: [HttpClientModule],
-})
-export class AppModule {}
+// byId - Create predicate for finding items by ID
+const users = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }];
+const user = users.find(byId(1));  // { id: 1, name: 'Alice' }
 
-// component.ts
-import { UsersService } from './generated';
-
-@Component({ ... })
-export class MyComponent {
-  constructor(private users: UsersService) {}
-
-  loadUsers() {
-    this.users.getUsers().subscribe(users => console.log(users));
-  }
-}
+// required - Assert required values with custom error types
+const userId = params.id ?? required('userId');
+const userId = params.id ?? required('userId', NotFoundException);
 ```
+
+## Build Orchestration
+
+This project uses [workgraph](https://github.com/tks2a/workgraph) for dependency-aware builds in watch mode.
+
+```bash
+# Install workgraph globally (optional)
+npm install -g workgraph
+
+# Or use via npx (used in npm scripts)
+npx workgraph analyze    # Show dependency graph
+npx workgraph build      # Build all projects in dependency order
+npx workgraph watch      # Watch mode with automatic rebuilds
+```
+
+The `npm run dev` script uses workgraph to:
+- Watch all projects for file changes
+- Only rebuild affected libraries (filtered to `libs/*`)
+- Optionally start app dev servers with prefixed output
 
 ## License
 

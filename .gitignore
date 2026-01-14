@@ -3,6 +3,7 @@
 libs/*/dist
 node_modules
 build
+**/.angular
 
 # generated client
 apps/web-angular/src/generated
@@ -61,3 +62,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .idea
 .claude
+
+package-lock.json
