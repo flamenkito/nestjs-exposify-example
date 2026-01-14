@@ -12,9 +12,10 @@
   "scripts": {
     "dev:api": "npm run dev -w @example/api",
     "dev:web": "npm run dev -w @example/web",
+    "build:auth": "npm run build -w @example/auth",
     "build:api": "npm run build -w @example/api",
     "build:web": "npm run build -w @example/web",
-    "build": "npm run build:web && npm run build:api",
+    "build": "npm run build:auth && npm run build:web && npm run build:api",
     "start:prod": "npm run start:prod -w @example/api"
   }
 }
