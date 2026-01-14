@@ -11,13 +11,15 @@
   ],
   "scripts": {
     "dev:api": "npm run dev -w @example/api",
-    "dev:web": "npm run dev -w @example/web",
+    "dev:web": "npm run dev -w @example/web-preact",
+    "dev:web-angular": "npm run dev -w @example/web-angular",
     "build:auth": "npm run build -w @example/auth",
     "build:client-gen": "npm run build -w @example/client-gen",
     "build:api": "npm run build -w @example/api",
-    "build:web": "npm run build -w @example/web",
-    "build": "npm run build:auth && npm run build:client-gen && npm run build:web && npm run build:api",
-    "generate:client": "node libs/client-gen/bin/client-gen.js -i ./apps/api/src -o ./generated",
+    "build:web": "npm run build -w @example/web-preact",
+    "build:web-angular": "npm run build -w @example/web-angular",
+    "build": "npm run build:auth && npm run build:client-gen && npm run build:web && npm run build:web-angular && npm run build:api",
+    "generate:client": "node libs/client-gen/dist/cli.js -i ./apps/api/src -i ./libs/auth/src -o ./apps/web-angular/src/generated",
     "start:prod": "npm run start:prod -w @example/api"
   }
 }

@@ -12,9 +12,9 @@ async function bootstrap() {
   // The AppModule contains all the configuration, controllers, and providers.
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS for frontend development (Vite dev server on port 3001)
+  // Enable CORS for frontend development
   app.enableCors({
-    origin: 'http://localhost:3001',
+    origin: ['http://localhost:3001', 'http://localhost:3002'],
   });
 
   // Enable global validation pipe to automatically validate incoming request payloads.

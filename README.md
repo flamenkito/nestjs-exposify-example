@@ -1,6 +1,6 @@
 # nestjs-exposify-example
 
-Example NestJS application demonstrating [nestjs-exposify](https://github.com/tks2a/nestjs-exposify) library usage with a Preact frontend.
+Example NestJS application demonstrating [nestjs-exposify](https://github.com/tks2a/nestjs-exposify) library usage with Preact and Angular frontends.
 
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
@@ -10,6 +10,7 @@ This project shows how to use the `nestjs-exposify` library to expose NestJS ser
 - Reusable JWT authentication library with permission-based RBAC
 - Angular client generator (ts-morph AST parsing)
 - Preact UI that consumes the JSON-RPC API
+- Angular 21 UI (zoneless, signal forms) that consumes the JSON-RPC API
 
 ## Installation
 
@@ -23,11 +24,15 @@ npm install
 # Backend (Terminal 1)
 npm run dev:api
 
-# Frontend (Terminal 2)
+# Preact Frontend (Terminal 2)
 npm run dev:web
+
+# Angular Frontend (Terminal 2 - alternative)
+npm run dev:web-angular
 ```
 
 Open http://localhost:3001 for the Preact UI with hot reload.
+Open http://localhost:3002 for the Angular UI with hot reload.
 
 ### Production
 
@@ -36,7 +41,8 @@ npm run build
 npm run start:prod
 ```
 
-Open http://localhost:3000 - NestJS serves both API and UI.
+- http://localhost:3000/preact - Preact UI
+- http://localhost:3000/angular - Angular UI
 
 ## Authentication
 
@@ -114,13 +120,24 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │   │   │   ├── app.module.ts
 │   │   │   └── main.ts
 │   │   └── package.json
-│   └── web/                    # Preact frontend
+│   ├── web-preact/             # Preact frontend
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   ├── App.tsx
+│   │   │   └── index.tsx
+│   │   ├── vite.config.ts
+│   │   └── package.json
+│   └── web-angular/            # Angular 21 frontend (zoneless)
 │       ├── src/
-│       │   ├── components/
-│       │   ├── hooks/
-│       │   ├── App.tsx
-│       │   └── index.tsx
-│       ├── vite.config.ts
+│       │   ├── app/
+│       │   │   ├── components/
+│       │   │   ├── services/
+│       │   │   ├── models/
+│       │   │   └── app.component.ts
+│       │   ├── main.ts
+│       │   └── styles.css
+│       ├── angular.json
 │       └── package.json
 ├── libs/
 │   ├── auth/                   # Reusable auth library

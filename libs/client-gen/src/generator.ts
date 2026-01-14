@@ -19,11 +19,11 @@ export class Generator {
   }
 
   generate(options: GeneratorOptions): void {
-    const { input, output, endpoint } = options;
+    const { inputs, output, endpoint } = options;
 
     // Parse source files
-    console.log(`Parsing source files from: ${input}`);
-    const result = this.parser.parse(input);
+    console.log(`Parsing source files from: ${inputs.join(', ')}`);
+    const result = this.parser.parse(inputs);
 
     console.log(`Found ${result.services.length} services, ${result.types.length} types`);
 
@@ -55,7 +55,7 @@ export class Generator {
     for (const type of result.types) {
       const fileName = this.toKebabCase(type.name) + '.ts';
       const filePath = path.join(modelsDir, fileName);
-      const code = this.generateModel(type);
+      const code = this.generateModel(type, result.types);
       fs.writeFileSync(filePath, FILE_HEADER + code);
       modelNames.push(type.name);
       console.log(`Generated: models/${fileName}`);
@@ -147,14 +147,44 @@ ${methods}
   }`;
   }
 
-  private generateModel(type: TypeMetadata): string {
+  private generateModel(type: TypeMetadata, allTypes: TypeMetadata[]): string {
+    let code: string;
+
     if (type.kind === 'class') {
       // Convert class to interface (strip decorators)
-      return this.classToInterface(type.sourceCode, type.name);
+      code = this.classToInterface(type.sourceCode, type.name);
+    } else {
+      // For interfaces, enums, type aliases - use as is but clean imports
+      code = this.cleanImports(type.sourceCode);
     }
 
-    // For interfaces, enums, type aliases - use as is but clean imports
-    return this.cleanImports(type.sourceCode);
+    // Find referenced types and add imports
+    const imports = this.findModelImports(code, type.name, allTypes);
+    if (imports) {
+      return imports + '\n' + code;
+    }
+
+    return code;
+  }
+
+  private findModelImports(code: string, currentTypeName: string, allTypes: TypeMetadata[]): string {
+    const referencedTypes: string[] = [];
+
+    for (const t of allTypes) {
+      if (t.name === currentTypeName) continue;
+
+      // Check if this type is referenced in the code (as a type, not just in text)
+      const typePattern = new RegExp(`\\b${t.name}\\b(?:<|\\s|;|\\)|\\]|,)`, 'g');
+      if (typePattern.test(code)) {
+        referencedTypes.push(t.name);
+      }
+    }
+
+    if (referencedTypes.length === 0) return '';
+
+    return referencedTypes
+      .map((t) => `import { ${t} } from './${this.toKebabCase(t)}';`)
+      .join('\n');
   }
 
   private classToInterface(code: string, name: string): string {

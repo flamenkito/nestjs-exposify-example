@@ -3,8 +3,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [preact()],
+  base: '/preact/',
   build: {
-    outDir: '../api/public',
+    outDir: '../../dist/web-preact',
     emptyOutDir: true,
   },
   server: {

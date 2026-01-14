@@ -20,9 +20,11 @@ export class Parser {
     });
   }
 
-  parse(inputDir: string): ParseResult {
-    // Add source files from input directory
-    this.project.addSourceFilesAtPaths(path.join(inputDir, '**/*.ts'));
+  parse(inputDirs: string[]): ParseResult {
+    // Add source files from all input directories
+    for (const inputDir of inputDirs) {
+      this.project.addSourceFilesAtPaths(path.join(inputDir, '**/*.ts'));
+    }
 
     const services: ServiceMetadata[] = [];
 
@@ -156,13 +158,27 @@ export class Parser {
   }
 
   private collectType(type: Type): void {
-    // Unwrap Promise, Array, etc.
+    // Get the symbol first to collect the base type (e.g., AuthResponse from AuthResponse<Role>)
+    const symbol = type.getSymbol() || type.getAliasSymbol();
+
+    // Collect the base type if it exists
+    if (symbol) {
+      const typeName = symbol.getName();
+
+      // Skip built-in types
+      if (!['string', 'number', 'boolean', 'void', 'null', 'undefined', 'any', 'unknown', 'Promise', 'Array'].includes(typeName)) {
+        if (!this.collectedTypes.has(typeName)) {
+          this.collectTypeFromSymbol(symbol, typeName);
+        }
+      }
+    }
+
+    // Then collect type arguments (e.g., Role from AuthResponse<Role>)
     const typeArgs = type.getTypeArguments();
     if (typeArgs.length > 0) {
       for (const arg of typeArgs) {
         this.collectType(arg);
       }
-      return;
     }
 
     // Unwrap array element type
@@ -171,21 +187,11 @@ export class Parser {
       if (elementType) {
         this.collectType(elementType);
       }
-      return;
     }
+  }
 
-    const symbol = type.getSymbol() || type.getAliasSymbol();
+  private collectTypeFromSymbol(symbol: ReturnType<Type['getSymbol']>, typeName: string): void {
     if (!symbol) return;
-
-    const typeName = symbol.getName();
-
-    // Skip built-in types
-    if (['string', 'number', 'boolean', 'void', 'null', 'undefined', 'any', 'unknown'].includes(typeName)) {
-      return;
-    }
-
-    // Skip already collected
-    if (this.collectedTypes.has(typeName)) return;
 
     const declarations = symbol.getDeclarations();
     if (declarations.length === 0) return;

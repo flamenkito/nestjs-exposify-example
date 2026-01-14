@@ -11,7 +11,13 @@ import { UsersModule } from './users';
     UsersModule,
     JsonRpcModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'public'),
+      rootPath: join(__dirname, '..', '..', 'web-preact'),
+      serveRoot: '/preact',
+      exclude: ['/rpc{/*path}'],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'web-angular', 'browser'),
+      serveRoot: '/angular',
       exclude: ['/rpc{/*path}'],
     }),
   ],

@@ -37,7 +37,7 @@ export interface PropertyMetadata {
 }
 
 export interface GeneratorOptions {
-  input: string;
+  inputs: string[];
   output: string;
   endpoint: string;
 }

@@ -1,13 +1,11 @@
 # compiled output
-dist
+/dist
+libs/*/dist
 node_modules
 build
 
-# built frontend
-apps/api/public
-
 # generated client
-generated
+apps/web-angular/src/generated
 
 # Logs
 logs
