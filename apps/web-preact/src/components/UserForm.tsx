@@ -27,11 +27,7 @@ export function UserForm({ user }: UserFormProps) {
 
     if (user) {
       // Update existing user
-      const result = await updateUser({
-        id: user.id,
-        name: name.value.trim(),
-        email: email.value.trim(),
-      });
+      const result = await updateUser(user.id, name.value.trim(), email.value.trim());
 
       if (result) {
         name.value = '';
@@ -42,10 +38,7 @@ export function UserForm({ user }: UserFormProps) {
       }
     } else {
       // Create new user
-      const result = await createUser({
-        name: name.value.trim(),
-        email: email.value.trim(),
-      });
+      const result = await createUser(name.value.trim(), email.value.trim());
 
       if (result) {
         name.value = '';
