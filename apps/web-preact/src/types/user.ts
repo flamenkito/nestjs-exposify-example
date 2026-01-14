@@ -8,3 +8,9 @@ export interface CreateUserDto {
   name: string;
   email: string;
 }
+
+export interface UpdateUserDto {
+  id: string;
+  name: string;
+  email: string;
+}

@@ -10,13 +10,27 @@
     "libs/*"
   ],
   "scripts": {
-    "dev": "npx workgraph watch --filter 'libs/*'",
+    "dev": "npx workgraph watch api web-angular web-preact",
     "build": "npx workgraph build",
-    "start:prod": "npm run start:prod -w @example/api"
+    "start:prod": "npm run start:prod -w @example/api",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,html}\" \"libs/**/*.ts\"",
+    "clean": "rm -rf dist apps/*/dist apps/*/src/generated libs/*/dist"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "prettier": "^3.4.2"
   },
   "workgraph": {
     "sources": {
-      "apps/web-angular/src/generated": "npx exposify-codegen api -o ./apps/web-angular/src/generated"
+      "apps/web-angular/src/generated": {
+        "command": "npx exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
+        "deps": ["api"]
+      },
+      "apps/web-preact/src/generated": {
+        "command": "npx exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
+        "deps": ["api"]
+      }
     }
   }
 }

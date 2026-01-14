@@ -9,7 +9,9 @@ import { AuthStateService } from '../services/auth-state.service';
   template: `
     <div class="login-container">
       <div class="login-box">
-        <h1>Login</h1>
+        <div class="login-brand">
+          <img src="exposify-logo.png" alt="Exposify" class="login-logo" />
+        </div>
         @if (auth.loginResource.error()) {
           <div class="error">{{ auth.loginResource.error() }}</div>
         }

@@ -13,7 +13,9 @@ export function LoginForm() {
   return (
     <div class="login-container">
       <div class="login-box">
-        <h1>Login</h1>
+        <div class="login-brand">
+          <img src="exposify-logo.png" alt="Exposify" class="login-logo" />
+        </div>
         {error.value && <div class="error">{error.value}</div>}
         <form onSubmit={handleSubmit}>
           <div class="form-group">

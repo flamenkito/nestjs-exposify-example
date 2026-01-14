@@ -20,3 +20,16 @@ export class CreateUserDto {
   @IsNotEmpty()
   email: string;
 }
+
+export class UpdateUserDto {
+  @IsUUID()
+  id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+}

@@ -1,26 +1,111 @@
-import { Component, input } from '@angular/core';
-import { UserDto } from '../../generated';
+import { Component, input, output, signal, effect, inject } from '@angular/core';
+import { UserDto, UsersService } from '../../generated';
 import { UserCardComponent } from './user-card.component';
+import { UserFormComponent } from './user-form.component';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [UserCardComponent],
+  imports: [UserCardComponent, UserFormComponent],
   template: `
-    @if (loading() && !users()?.length) {
-      <p class="loading">Loading users...</p>
-    } @else if (!users()?.length) {
-      <p class="empty">No users found. Create one below!</p>
-    } @else {
-      <div class="user-grid">
-        @for (user of users(); track user.id) {
-          <app-user-card [user]="user" />
-        }
+    <div class="user-list-container">
+      <div class="table-wrapper">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (loading() && !users()?.length) {
+              <tr>
+                <td colspan="2" class="table-placeholder">Loading users...</td>
+              </tr>
+            } @else if (!users()?.length) {
+              <tr>
+                <td colspan="2" class="table-placeholder">No users found</td>
+              </tr>
+            } @else {
+              @for (user of users(); track user.id) {
+                <tr
+                  [class.selected]="selectedUser()?.id === user.id"
+                  (click)="selectUser(user)">
+                  <td>{{ user.name }}</td>
+                  <td>{{ user.email }}</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
       </div>
-    }
+
+      @if (showCreateForm()) {
+        <app-user-form (created)="onCreated()" />
+      } @else if (editing()) {
+        <app-user-form [user]="selectedUser()!" (created)="onUpdated()" />
+      } @else if (selectedUser()) {
+        <app-user-card [user]="selectedUser()!" [deleting]="deleting()" (edit)="editing.set(true)" (delete)="onDelete()" />
+      }
+    </div>
   `,
 })
 export class UserListComponent {
+  private readonly usersService = inject(UsersService);
+
   users = input<UserDto[] | undefined>();
   loading = input(false);
+  showCreateForm = input(false);
+
+  created = output<void>();
+  deleted = output<void>();
+  userSelected = output<void>();
+
+  selectedUser = signal<UserDto | null>(null);
+  deleting = signal(false);
+  editing = signal(false);
+
+  constructor() {
+    effect(() => {
+      if (this.showCreateForm()) {
+        this.selectedUser.set(null);
+      }
+    });
+  }
+
+  selectUser(user: UserDto) {
+    if (this.selectedUser()?.id === user.id) {
+      this.selectedUser.set(null);
+    } else {
+      this.selectedUser.set(user);
+      this.userSelected.emit();
+    }
+  }
+
+  onCreated() {
+    this.created.emit();
+  }
+
+  onUpdated() {
+    this.editing.set(false);
+    this.selectedUser.set(null);
+    this.created.emit();
+  }
+
+  onDelete() {
+    const user = this.selectedUser();
+    if (!user) return;
+
+    this.deleting.set(true);
+    this.usersService.deleteUser({ id: user.id }).subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.selectedUser.set(null);
+        this.deleted.emit();
+      },
+      error: () => {
+        this.deleting.set(false);
+      },
+    });
+  }
 }

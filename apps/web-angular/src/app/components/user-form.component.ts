@@ -1,37 +1,35 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UsersService } from '../../generated';
+import { UsersService, UserDto } from '../../generated';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
   imports: [FormsModule],
   template: `
-    <div class="form-section">
-      <h2>Create User</h2>
+    <div class="user-card">
+      <h3>{{ user() ? 'Edit User' : 'Create User' }}</h3>
       @if (error()) {
         <div class="error">{{ error() }}</div>
       }
-      <form (ngSubmit)="handleSubmit()">
-        <div class="form-row">
-          <input
-            type="text"
-            placeholder="Name"
-            [(ngModel)]="name"
-            name="name"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            [(ngModel)]="email"
-            name="email"
-            required
-          />
-          <button type="submit" class="primary" [disabled]="loading()">
-            {{ loading() ? 'Creating...' : 'Create' }}
-          </button>
-        </div>
+      <form (ngSubmit)="handleSubmit()" class="create-form">
+        <input
+          type="text"
+          placeholder="Name"
+          [(ngModel)]="name"
+          name="name"
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+        <button type="submit" class="primary" [disabled]="loading()">
+          {{ loading() ? (user() ? 'Saving...' : 'Creating...') : (user() ? 'Save' : 'Create') }}
+        </button>
       </form>
     </div>
   `,
@@ -39,12 +37,23 @@ import { UsersService } from '../../generated';
 export class UserFormComponent {
   private readonly usersService = inject(UsersService);
 
+  user = input<UserDto>();
   created = output<void>();
 
   name = signal('');
   email = signal('');
   loading = signal(false);
   error = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const u = this.user();
+      if (u) {
+        this.name.set(u.name);
+        this.email.set(u.email);
+      }
+    });
+  }
 
   handleSubmit() {
     const nameVal = this.name().trim();
@@ -54,7 +63,12 @@ export class UserFormComponent {
     this.loading.set(true);
     this.error.set(null);
 
-    this.usersService.createUser({ name: nameVal, email: emailVal }).subscribe({
+    const u = this.user();
+    const request$ = u
+      ? this.usersService.updateUser({ id: u.id, name: nameVal, email: emailVal })
+      : this.usersService.createUser({ name: nameVal, email: emailVal });
+
+    request$.subscribe({
       next: () => {
         this.name.set('');
         this.email.set('');

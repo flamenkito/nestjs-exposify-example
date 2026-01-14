@@ -5,8 +5,8 @@ node_modules
 build
 **/.angular
 
-# generated client
-apps/web-angular/src/generated
+# generated clients
+**/generated
 
 # Logs
 logs
