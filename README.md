@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="docs/assets/logo_icon_transparent_1024.png" alt="nestjs-exposify Logo" width="128">
-  <h1>nestjs-exposify-example</h1>
-  <p><strong>Example monorepo demonstrating nestjs-exposify</strong></p>
-
-  [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo.png">
+    <img src="assets/logo.png" alt="Exposify Logo" width="400">
+  </picture>
 </div>
 
-Example NestJS application demonstrating [nestjs-exposify](https://github.com/flamenkito/nestjs-exposify) library usage with Preact and Angular frontends. Includes:
+Example monorepo demonstrating [nestjs-exposify](https://github.com/flamenkito/nestjs-exposify) library usage with Preact and Angular frontends. Includes:
 - Reusable JWT authentication library with permission-based RBAC
 - Client generation via [exposify-codegen](https://github.com/flamenkito/exposify-codegen)
 - Preact UI that consumes the JSON-RPC API
