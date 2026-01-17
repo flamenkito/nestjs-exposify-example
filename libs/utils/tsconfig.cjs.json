@@ -1,17 +1,8 @@
 {
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "module": "CommonJS",
     "declaration": false,
-    "removeComments": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2022",
-    "sourceMap": true,
-    "outDir": "./dist/cjs",
-    "rootDir": "./src",
-    "strict": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+    "outDir": "./dist/cjs"
+  }
 }
