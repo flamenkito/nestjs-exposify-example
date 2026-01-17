@@ -1,5 +1,5 @@
 import { signal } from '@preact/signals';
-import { login, loading, error } from '../hooks/useJsonRpc';
+import { error, loading, login } from '../hooks/useJsonRpc';
 
 const email = signal('admin@example.com');
 const password = signal('password');
@@ -17,7 +17,7 @@ export function LoginForm() {
           <img src="exposify-logo.png" alt="Exposify" class="login-logo" />
         </div>
         {error.value && <div class="error">{error.value}</div>}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => void handleSubmit(e)}>
           <div class="form-group">
             <label>Email</label>
             <input

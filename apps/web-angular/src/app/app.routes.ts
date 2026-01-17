@@ -7,17 +7,17 @@ export const routes: Routes = [
     children: [
       {
         path: 'login',
-        loadChildren: () => import('./pages/login/routes').then(m => m.default)
+        loadChildren: () => import('./pages/login/routes').then((m) => m.default),
       },
       {
         path: 'users',
         canActivate: [authGuard],
-        loadChildren: () => import('./pages/users/routes').then(m => m.default)
+        loadChildren: () => import('./pages/users/routes').then((m) => m.default),
       },
       {
         path: '**',
         redirectTo: 'users',
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];

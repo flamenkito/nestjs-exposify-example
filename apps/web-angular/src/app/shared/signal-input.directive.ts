@@ -3,8 +3,8 @@ import { Directive, effect, ElementRef, inject, input, WritableSignal } from '@a
 @Directive({
   selector: 'input[signal], textarea[signal]',
   host: {
-    '(input)': 'onInput($event)'
-  }
+    '(input)': 'onInput($event)',
+  },
 })
 export class SignalInputDirective {
   private readonly el = inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef);

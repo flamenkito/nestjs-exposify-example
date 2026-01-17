@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, resource, inject } from '@angular/core';
+import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthService, AuthUser, LoginDto, Role } from '../../generated';
 
@@ -7,9 +7,11 @@ export class AuthStateService {
   private readonly authService = inject(AuthService);
 
   readonly token = signal<string | null>(localStorage.getItem('token'));
+
   readonly currentUser = signal<AuthUser<Role> | null>(
-    JSON.parse(localStorage.getItem('user') || 'null')
+    JSON.parse(localStorage.getItem('user') || 'null') as AuthUser<Role> | null,
   );
+
   readonly isAuthenticated = computed(() => !!this.token());
 
   private loginRequest = signal<LoginDto | undefined>(undefined);

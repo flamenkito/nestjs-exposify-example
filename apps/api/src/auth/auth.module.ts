@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
 import { AuthModule as AuthLibModule } from '@example/auth';
-import { AuthService } from './auth.service';
+import { Module } from '@nestjs/common';
 import { ROLE_PERMISSIONS } from './auth.config';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [

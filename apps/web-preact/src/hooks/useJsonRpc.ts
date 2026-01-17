@@ -1,19 +1,19 @@
-import { signal, computed } from '@preact/signals';
 import { byId } from '@example/utils';
+import { computed, signal } from '@preact/signals';
+import type { AuthUser, Role, UserDto } from '../generated';
 import { setAuthToken } from '../generated';
 import {
-  login as apiLogin,
-  getUsers as apiGetUsers,
   createUser as apiCreateUser,
-  updateUser as apiUpdateUser,
   deleteUser as apiDeleteUser,
+  getUsers as apiGetUsers,
+  login as apiLogin,
+  updateUser as apiUpdateUser,
 } from '../generated/services';
-import type { UserDto, AuthUser, Role } from '../generated';
 
 // Auth state
 export const token = signal<string | null>(localStorage.getItem('token'));
 export const currentUser = signal<AuthUser<Role> | null>(
-  JSON.parse(localStorage.getItem('user') || 'null')
+  JSON.parse(localStorage.getItem('user') || 'null') as AuthUser<Role> | null,
 );
 export const isAuthenticated = computed(() => !!token.value);
 

@@ -28,7 +28,9 @@ async function bootstrap() {
 
   // Start the HTTP server and listen for incoming requests.
   // Uses PORT environment variable if set, otherwise defaults to port 3000.
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+  console.log(`Server listening on http://localhost:${port}`);
 }
 
 void bootstrap();

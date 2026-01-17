@@ -1,13 +1,54 @@
-import {
-  users,
-  loading,
-  selectedUser,
-  selectUser,
-  showCreateForm,
-  editing,
-} from '../hooks/useJsonRpc';
+import { editing, loading, selectedUser, selectUser, showCreateForm, users } from '../hooks/useJsonRpc';
 import { UserCard } from './UserCard';
 import { UserForm } from './UserForm';
+
+import type { JSX } from 'preact';
+
+function renderTableBody(): JSX.Element {
+  if (loading.value && users.value.length === 0) {
+    return (
+      <tr>
+        <td colSpan={2} class="table-placeholder">
+          Loading users...
+        </td>
+      </tr>
+    );
+  }
+
+  if (users.value.length === 0) {
+    return (
+      <tr>
+        <td colSpan={2} class="table-placeholder">
+          No users found
+        </td>
+      </tr>
+    );
+  }
+
+  return (
+    <>
+      {users.value.map((user) => (
+        <tr key={user.id} class={selectedUser.value?.id === user.id ? 'selected' : ''} onClick={() => selectUser(user)}>
+          <td>{user.name}</td>
+          <td>{user.email}</td>
+        </tr>
+      ))}
+    </>
+  );
+}
+
+function renderDetailPanel() {
+  if (showCreateForm.value) {
+    return <UserForm user={undefined} />;
+  }
+  if (editing.value && selectedUser.value) {
+    return <UserForm user={selectedUser.value} />;
+  }
+  if (selectedUser.value) {
+    return <UserCard user={selectedUser.value} />;
+  }
+  return null;
+}
 
 export function UserList() {
   return (
@@ -20,38 +61,11 @@ export function UserList() {
               <th>Email</th>
             </tr>
           </thead>
-          <tbody>
-            {loading.value && users.value.length === 0 ? (
-              <tr>
-                <td colSpan={2} class="table-placeholder">Loading users...</td>
-              </tr>
-            ) : users.value.length === 0 ? (
-              <tr>
-                <td colSpan={2} class="table-placeholder">No users found</td>
-              </tr>
-            ) : (
-              users.value.map((user) => (
-                <tr
-                  key={user.id}
-                  class={selectedUser.value?.id === user.id ? 'selected' : ''}
-                  onClick={() => selectUser(user)}
-                >
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
+          <tbody>{renderTableBody()}</tbody>
         </table>
       </div>
 
-      {showCreateForm.value ? (
-        <UserForm />
-      ) : editing.value && selectedUser.value ? (
-        <UserForm user={selectedUser.value} />
-      ) : selectedUser.value ? (
-        <UserCard user={selectedUser.value} />
-      ) : null}
+      {renderDetailPanel()}
     </div>
   );
 }

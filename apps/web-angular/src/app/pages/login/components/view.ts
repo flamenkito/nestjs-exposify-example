@@ -36,15 +36,17 @@ import { SignalInputDirective } from '../../../shared/signal-input.directive';
 })
 export class View {
   private readonly router = inject(Router);
+
   readonly auth = inject(AuthStateService);
 
   email = signal('admin@example.com');
+
   password = signal('password');
 
   constructor() {
     effect(() => {
       if (this.auth.loginResource.value()) {
-        this.router.navigate(['']);
+        void this.router.navigate(['']);
       }
     });
   }

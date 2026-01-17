@@ -1,21 +1,36 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-import { createUser, updateUser, loading, showCreateForm, stopEditing, fetchUsers, selectedUser } from '../hooks/useJsonRpc';
+import {
+  createUser,
+  fetchUsers,
+  loading,
+  selectedUser,
+  showCreateForm,
+  stopEditing,
+  updateUser,
+} from '../hooks/useJsonRpc';
 import type { User } from '../types/user';
 
+function getButtonText(isLoading: boolean, isEditing: boolean): string {
+  if (isLoading) {
+    return isEditing ? 'Saving...' : 'Creating...';
+  }
+  return isEditing ? 'Save' : 'Create';
+}
+
 interface UserFormProps {
-  user?: User;
+  readonly user: User | undefined;
 }
 
 export function UserForm({ user }: UserFormProps) {
-  const name = useSignal(user?.name ?? '');
-  const email = useSignal(user?.email ?? '');
+  const name = useSignal(user ? user.name : '');
+  const email = useSignal(user ? user.email : '');
   const formError = useSignal<string | null>(null);
 
   // Update form when user prop changes
   useEffect(() => {
-    name.value = user?.name ?? '';
-    email.value = user?.email ?? '';
+    name.value = user ? user.name : '';
+    email.value = user ? user.email : '';
     formError.value = null;
   }, [user?.id]);
 
@@ -34,7 +49,7 @@ export function UserForm({ user }: UserFormProps) {
         email.value = '';
         stopEditing();
         selectedUser.value = null;
-        fetchUsers();
+        void fetchUsers();
       }
     } else {
       // Create new user
@@ -52,7 +67,7 @@ export function UserForm({ user }: UserFormProps) {
     <div class="user-card">
       <h3>{user ? 'Edit User' : 'Create User'}</h3>
       {formError.value && <div class="error">{formError.value}</div>}
-      <form onSubmit={handleSubmit} class="create-form">
+      <form onSubmit={(e) => void handleSubmit(e)} class="create-form">
         <input
           type="text"
           placeholder="Name"
@@ -66,13 +81,7 @@ export function UserForm({ user }: UserFormProps) {
           onInput={(e) => (email.value = (e.target as HTMLInputElement).value)}
         />
         <button type="submit" class="primary" disabled={loading.value}>
-          {loading.value
-            ? user
-              ? 'Saving...'
-              : 'Creating...'
-            : user
-              ? 'Save'
-              : 'Create'}
+          {getButtonText(loading.value, !!user)}
         </button>
       </form>
     </div>

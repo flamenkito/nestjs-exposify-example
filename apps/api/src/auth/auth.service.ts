@@ -1,11 +1,15 @@
+import { AuthResponse, AuthUser, Public } from '@example/auth';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthResponse, AuthUser, Public } from '@example/auth';
 import * as bcrypt from 'bcrypt';
 import { Expose } from 'nestjs-exposify';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from './auth.config';
 import { LoginDto, RegisterDto } from './auth.dto';
+
+// Password: "password"
+// eslint-disable-next-line sonarjs/no-hardcoded-passwords
+const passwordHash = '$2b$10$1mt58fwdDw3YvdWY5c.z0OhPjr2IrVS1LeNythMesdeY3lmUmSt/y';
 
 interface StoredUser {
   id: string;
@@ -22,7 +26,7 @@ const users: StoredUser[] = [
     name: 'Admin',
     email: 'admin@example.com',
     // Password: "password"
-    passwordHash: '$2b$10$1mt58fwdDw3YvdWY5c.z0OhPjr2IrVS1LeNythMesdeY3lmUmSt/y',
+    passwordHash,
     role: 'admin',
   },
   {
@@ -30,7 +34,7 @@ const users: StoredUser[] = [
     name: 'User',
     email: 'user@example.com',
     // Password: "password"
-    passwordHash: '$2b$10$1mt58fwdDw3YvdWY5c.z0OhPjr2IrVS1LeNythMesdeY3lmUmSt/y',
+    passwordHash,
     role: 'user',
   },
 ];
@@ -101,7 +105,7 @@ export class AuthService {
     };
   }
 
-  async me(user: AuthUser<Role>): Promise<AuthUser<Role>> {
+  me(user: AuthUser<Role>): AuthUser<Role> {
     return user;
   }
 }

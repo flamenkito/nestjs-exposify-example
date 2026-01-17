@@ -4,8 +4,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { JsonRpcModule } from 'nestjs-exposify';
 import { join } from 'path';
 import { AuthModule } from './auth';
-import { UsersModule } from './users';
 import { DelayInterceptor } from './delay.interceptor';
+import { UsersModule } from './users';
 
 const WEB_PREACT_PATH = join(__dirname, '..', '..', 'web-preact');
 const WEB_ANGULAR_PATH = join(__dirname, '..', '..', 'web-angular', 'browser');

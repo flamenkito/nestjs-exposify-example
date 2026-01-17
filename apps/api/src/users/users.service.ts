@@ -1,7 +1,7 @@
-import { Expose } from 'nestjs-exposify';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { byId, required } from '@example/utils';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Expose } from 'nestjs-exposify';
+import { v4 as uuidv4 } from 'uuid';
 import { Permissions } from '../auth';
 import { CreateUserDto, IdDto, UpdateUserDto, UserDto } from './user.dto';
 
@@ -37,8 +37,7 @@ export class UsersService {
 
   @Permissions('user:update')
   updateUser(dto: UpdateUserDto): UserDto {
-    const user =
-      users.find(byId(dto.id)) ?? required(`user with id ${dto.id}`, NotFoundException);
+    const user = users.find(byId(dto.id)) ?? required(`user with id ${dto.id}`, NotFoundException);
     user.name = dto.name;
     user.email = dto.email;
     return user;

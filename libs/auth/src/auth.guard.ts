@@ -1,23 +1,23 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './auth.dto';
-import { PUBLIC_METHODS } from './public.decorator';
 import { hasAllPermissions, METHOD_PERMISSIONS } from './permissions.decorator';
+import { PUBLIC_METHODS } from './public.decorator';
+
+interface JsonRpcRequest {
+  headers: { authorization: string | undefined };
+  body: { method: string | undefined };
+  user: JwtPayload | undefined;
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<JsonRpcRequest>();
     const body = request.body;
-    const methodName = body?.method;
+    const methodName = body.method;
 
     // Check if this is a JSON-RPC request with a public method
     if (methodName && PUBLIC_METHODS.has(methodName)) {
@@ -32,8 +32,8 @@ export class JwtAuthGuard implements CanActivate {
 
     let payload: JwtPayload;
     try {
-      payload = await this.jwtService.verifyAsync(token);
-      request['user'] = payload;
+      payload = await this.jwtService.verifyAsync<JwtPayload>(token);
+      request.user = payload;
     } catch {
       throw new UnauthorizedException('Invalid token');
     }
@@ -44,17 +44,19 @@ export class JwtAuthGuard implements CanActivate {
       const userRole = payload.role;
 
       if (!hasAllPermissions(userRole, requiredPermissions)) {
-        throw new ForbiddenException(
-          `Access denied. Required permissions: ${requiredPermissions.join(', ')}`,
-        );
+        throw new ForbiddenException(`Access denied. Required permissions: ${requiredPermissions.join(', ')}`);
       }
     }
 
     return true;
   }
 
-  private extractTokenFromHeader(request: { headers: { authorization?: string } }): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  private extractTokenFromHeader(request: JsonRpcRequest): string | undefined {
+    const authorization = request.headers.authorization;
+    if (!authorization) {
+      return undefined;
+    }
+    const [type, token] = authorization.split(' ');
     return type === 'Bearer' ? token : undefined;
   }
 }

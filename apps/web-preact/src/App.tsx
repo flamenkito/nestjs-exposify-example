@@ -1,19 +1,21 @@
 import { useEffect } from 'preact/hooks';
-import { UserList } from './components/UserList';
 import { LoginForm } from './components/LoginForm';
-import {
-  fetchUsers,
-  error,
-  loading,
-  isAuthenticated,
-  currentUser,
-  logout,
-  toggleCreateForm,
-} from './hooks/useJsonRpc';
+import { UserList } from './components/UserList';
+import { currentUser, error, fetchUsers, isAuthenticated, loading, logout, toggleCreateForm } from './hooks/useJsonRpc';
 
 // SVG Icons
 const LogoutIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
     <polyline points="16 17 21 12 16 7"></polyline>
     <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -21,14 +23,35 @@ const LogoutIcon = () => (
 );
 
 const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
     <line x1="12" y1="5" x2="12" y2="19"></line>
     <line x1="5" y1="12" x2="19" y2="12"></line>
   </svg>
 );
 
 const RefreshIcon = ({ spinning }: { spinning: boolean }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class={spinning ? 'spin' : ''}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class={spinning ? 'spin' : ''}
+  >
     <polyline points="23 4 23 10 17 10"></polyline>
     <polyline points="1 20 1 14 7 14"></polyline>
     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -38,7 +61,7 @@ const RefreshIcon = ({ spinning }: { spinning: boolean }) => (
 export function App() {
   useEffect(() => {
     if (isAuthenticated.value) {
-      fetchUsers();
+      void fetchUsers();
     }
   }, [isAuthenticated.value]);
 
@@ -75,7 +98,7 @@ export function App() {
         <button class="primary icon-only" onClick={toggleCreateForm} title="Create User">
           <PlusIcon />
         </button>
-        <button class="secondary" onClick={fetchUsers} disabled={loading.value}>
+        <button class="secondary" onClick={() => void fetchUsers()} disabled={loading.value}>
           <RefreshIcon spinning={loading.value} />
           Refresh
         </button>

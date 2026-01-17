@@ -8,10 +8,7 @@ let rolePermissionsMap: Record<string, string[]> = {};
  * Set the role-permissions mapping at runtime.
  * Called by AuthModule.forRoot()
  */
-export function setRolePermissions<
-  R extends string,
-  P extends string,
->(mapping: Record<R, readonly P[]>): void {
+export function setRolePermissions<R extends string, P extends string>(mapping: Record<R, readonly P[]>): void {
   rolePermissionsMap = mapping as unknown as Record<string, string[]>;
 }
 

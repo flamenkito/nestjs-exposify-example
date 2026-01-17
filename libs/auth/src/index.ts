@@ -1,12 +1,12 @@
-export * from './auth.module';
-export * from './auth.guard';
 export * from './auth.dto';
-export * from './public.decorator';
+export * from './auth.guard';
+export * from './auth.module';
 export {
+  METHOD_PERMISSIONS,
+  Permissions,
   createPermissionsDecorator,
   hasAllPermissions,
   hasPermission,
-  METHOD_PERMISSIONS,
-  Permissions,
   setRolePermissions,
 } from './permissions.decorator';
+export * from './public.decorator';

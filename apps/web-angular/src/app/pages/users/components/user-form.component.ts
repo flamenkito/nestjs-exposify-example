@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, input, output, signal, effect } from '@angular/core';
-import { UsersService, UserDto } from '../../../../generated';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
+import { UserDto, UsersService } from '../../../../generated';
 import { SignalInputDirective } from '../../../shared/signal-input.directive';
 
 @Component({
@@ -16,7 +16,7 @@ import { SignalInputDirective } from '../../../shared/signal-input.directive';
         <input type="text" placeholder="Name" [signal]="name" required />
         <input type="email" placeholder="Email" [signal]="email" required />
         <button type="submit" class="primary" [disabled]="loading()">
-          {{ loading() ? (user() ? 'Saving...' : 'Creating...') : (user() ? 'Save' : 'Create') }}
+          {{ loading() ? (user() ? 'Saving...' : 'Creating...') : user() ? 'Save' : 'Create' }}
         </button>
       </form>
     </div>
@@ -26,11 +26,15 @@ export class UserFormComponent {
   private readonly usersService = inject(UsersService);
 
   user = input<UserDto>();
+
   created = output<void>();
 
   name = signal('');
+
   email = signal('');
+
   loading = signal(false);
+
   error = signal<string | null>(null);
 
   constructor() {
@@ -64,7 +68,7 @@ export class UserFormComponent {
         this.loading.set(false);
         this.created.emit();
       },
-      error: (e) => {
+      error: (e: Error) => {
         this.error.set(e.message);
         this.loading.set(false);
       },

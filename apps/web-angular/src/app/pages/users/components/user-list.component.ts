@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output, signal, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { byId } from '@example/utils';
 import { UserDto, UsersService } from '../../../../generated';
 import { UserCardComponent } from './user-card.component';
@@ -29,9 +29,7 @@ import { UserFormComponent } from './user-form.component';
               </tr>
             } @else {
               @for (user of users(); track user.id) {
-                <tr
-                  [class.selected]="isSelected(user)"
-                  (click)="selectUser(user)">
+                <tr [class.selected]="isSelected(user)" (click)="selectUser(user)">
                   <td>{{ user.name }}</td>
                   <td>{{ user.email }}</td>
                 </tr>
@@ -46,7 +44,12 @@ import { UserFormComponent } from './user-form.component';
       } @else if (editing()) {
         <app-user-form [user]="selectedUser()!" (created)="onUpdated()" />
       } @else if (selectedUser()) {
-        <app-user-card [user]="selectedUser()!" [deleting]="deleting()" (edit)="editing.set(true)" (delete)="onDelete()" />
+        <app-user-card
+          [user]="selectedUser()!"
+          [deleting]="deleting()"
+          (edit)="editing.set(true)"
+          (delete)="onDelete()"
+        />
       }
     </div>
   `,
@@ -55,15 +58,21 @@ export class UserListComponent {
   private readonly usersService = inject(UsersService);
 
   users = input<UserDto[] | undefined>();
+
   loading = input(false);
+
   showCreateForm = input(false);
 
   created = output<void>();
+
   deleted = output<void>();
+
   userSelected = output<void>();
 
   selectedUser = signal<UserDto | null>(null);
+
   deleting = signal(false);
+
   editing = signal(false);
 
   constructor() {

@@ -7,8 +7,8 @@ export default [
     children: [
       {
         path: '',
-        component: View
-      }
-    ]
-  }
-] satisfies Routes
+        component: View,
+      },
+    ],
+  },
+] satisfies Routes;

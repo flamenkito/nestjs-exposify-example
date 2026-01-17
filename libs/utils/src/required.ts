@@ -10,10 +10,7 @@ type ErrorConstructor = new (message: string) => Error;
  * @example
  * const user = users.find(byId(id)) ?? required(`user with id ${id}`, NotFoundException);
  */
-export const required = (
-  name: string,
-  ExceptionType?: ErrorConstructor,
-): never => {
+export const required = (name: string, ExceptionType?: ErrorConstructor): never => {
   const message = `Expected ${name}`;
   if (ExceptionType) {
     throw new ExceptionType(message);

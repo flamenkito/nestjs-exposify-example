@@ -18,18 +18,25 @@
   },
   "devDependencies": {
     "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.2.2",
-    "prettier": "^3.4.2"
+    "eslint-plugin-sonarjs": "^3.0.5",
+    "prettier": "^3.4.2",
+    "prettier-plugin-organize-imports": "^4.3.0"
   },
   "workgraph": {
     "sources": {
       "web-angular": {
         "command": "npx exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
-        "deps": ["api"]
+        "deps": [
+          "api"
+        ]
       },
       "web-preact": {
         "command": "npx exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
-        "deps": ["api"]
+        "deps": [
+          "api"
+        ]
       }
     }
   }
