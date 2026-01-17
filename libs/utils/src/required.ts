@@ -14,7 +14,7 @@ export const required = (
   name: string,
   ExceptionType?: ErrorConstructor,
 ): never => {
-  const message = `Expected  ${name}`;
+  const message = `Expected ${name}`;
   if (ExceptionType) {
     throw new ExceptionType(message);
   }

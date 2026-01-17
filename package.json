@@ -23,11 +23,11 @@
   },
   "workgraph": {
     "sources": {
-      "apps/web-angular/src/generated": {
+      "web-angular": {
         "command": "npx exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
         "deps": ["api"]
       },
-      "apps/web-preact/src/generated": {
+      "web-preact": {
         "command": "npx exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
         "deps": ["api"]
       }
