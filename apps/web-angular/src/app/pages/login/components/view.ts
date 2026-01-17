@@ -1,11 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { AuthStateService } from '../services/auth-state.service';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthStateService } from '../../../services/auth-state.service';
+import { SignalInputDirective } from '../../../shared/signal-input.directive';
 
 @Component({
-  selector: 'app-login-form',
-  standalone: true,
-  imports: [FormsModule],
+  selector: 'app-login',
+  imports: [SignalInputDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="login-container">
       <div class="login-box">
@@ -15,24 +16,14 @@ import { AuthStateService } from '../services/auth-state.service';
         @if (auth.loginResource.error()) {
           <div class="error">{{ auth.loginResource.error() }}</div>
         }
-        <form (ngSubmit)="handleSubmit()">
+        <form (submit)="handleSubmit($event)">
           <div class="form-group">
             <label>Email</label>
-            <input
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              required
-            />
+            <input type="email" [signal]="email" required />
           </div>
           <div class="form-group">
             <label>Password</label>
-            <input
-              type="password"
-              [(ngModel)]="password"
-              name="password"
-              required
-            />
+            <input type="password" [signal]="password" required />
           </div>
           <button type="submit" class="primary" [disabled]="auth.loginResource.isLoading()">
             {{ auth.loginResource.isLoading() ? 'Logging in...' : 'Login' }}
@@ -43,13 +34,23 @@ import { AuthStateService } from '../services/auth-state.service';
     </div>
   `,
 })
-export class LoginFormComponent {
+export class View {
+  private readonly router = inject(Router);
   readonly auth = inject(AuthStateService);
 
   email = signal('admin@example.com');
   password = signal('password');
 
-  handleSubmit() {
+  constructor() {
+    effect(() => {
+      if (this.auth.loginResource.value()) {
+        this.router.navigate(['']);
+      }
+    });
+  }
+
+  handleSubmit(event: Event) {
+    event.preventDefault();
     this.auth.login(this.email(), this.password());
   }
 }

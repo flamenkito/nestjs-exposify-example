@@ -1,32 +1,20 @@
-import { Component, inject, input, output, signal, effect } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { UsersService, UserDto } from '../../generated';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal, effect } from '@angular/core';
+import { UsersService, UserDto } from '../../../../generated';
+import { SignalInputDirective } from '../../../shared/signal-input.directive';
 
 @Component({
   selector: 'app-user-form',
-  standalone: true,
-  imports: [FormsModule],
+  imports: [SignalInputDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="user-card">
       <h3>{{ user() ? 'Edit User' : 'Create User' }}</h3>
       @if (error()) {
         <div class="error">{{ error() }}</div>
       }
-      <form (ngSubmit)="handleSubmit()" class="create-form">
-        <input
-          type="text"
-          placeholder="Name"
-          [(ngModel)]="name"
-          name="name"
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          [(ngModel)]="email"
-          name="email"
-          required
-        />
+      <form (submit)="handleSubmit($event)" class="create-form">
+        <input type="text" placeholder="Name" [signal]="name" required />
+        <input type="email" placeholder="Email" [signal]="email" required />
         <button type="submit" class="primary" [disabled]="loading()">
           {{ loading() ? (user() ? 'Saving...' : 'Creating...') : (user() ? 'Save' : 'Create') }}
         </button>
@@ -55,7 +43,8 @@ export class UserFormComponent {
     });
   }
 
-  handleSubmit() {
+  handleSubmit(event: Event) {
+    event.preventDefault();
     const nameVal = this.name().trim();
     const emailVal = this.email().trim();
     if (!nameVal || !emailVal) return;

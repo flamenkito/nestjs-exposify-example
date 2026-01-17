@@ -1,13 +1,13 @@
-import { Component, input, output, signal, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal, effect, inject } from '@angular/core';
 import { byId } from '@example/utils';
-import { UserDto, UsersService } from '../../generated';
+import { UserDto, UsersService } from '../../../../generated';
 import { UserCardComponent } from './user-card.component';
 import { UserFormComponent } from './user-form.component';
 
 @Component({
   selector: 'app-user-list',
-  standalone: true,
   imports: [UserCardComponent, UserFormComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="user-list-container">
       <div class="table-wrapper">

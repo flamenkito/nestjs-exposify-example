@@ -1,9 +1,9 @@
-import { Component, input, output } from '@angular/core';
-import { UserDto } from '../../generated';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { UserDto } from '../../../../generated';
 
 @Component({
   selector: 'app-user-card',
-  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="user-card">
       <h3>{{ user().name }}</h3>
