@@ -10,9 +10,9 @@
     "libs/*"
   ],
   "scripts": {
-    "dev": "npx workgraph watch api web-angular web-preact",
-    "build": "npx workgraph build",
-    "start:prod": "npm run start:prod -w @example/api",
+    "dev": "workgraph watch api web-angular web-preact",
+    "build": "workgraph build",
+    "start:prod": "bun run --filter '@example/api' start:prod",
     "format": "prettier --write \"apps/**/*.{ts,tsx,css,html}\" \"libs/**/*.ts\"",
     "clean": "rm -rf dist apps/*/dist apps/*/src/generated libs/*/dist"
   },
@@ -21,19 +21,21 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.2.2",
     "eslint-plugin-sonarjs": "^3.0.5",
+    "exposify-codegen": "^0.0.3",
     "prettier": "^3.4.2",
-    "prettier-plugin-organize-imports": "^4.3.0"
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "workgraph": "^0.0.8"
   },
   "workgraph": {
     "sources": {
       "web-angular": {
-        "command": "npx exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
+        "command": "exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
         "deps": [
           "api"
         ]
       },
       "web-preact": {
-        "command": "npx exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
+        "command": "exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
         "deps": [
           "api"
         ]
