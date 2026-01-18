@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStateService } from '~/app/services/auth-state.service';
+import { AuthStateService } from '~/app/auth/auth-state.service';
 import { SignalInputDirective } from '~/app/shared/signal-input.directive';
 
 @Component({

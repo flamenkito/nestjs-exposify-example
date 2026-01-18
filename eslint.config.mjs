@@ -175,6 +175,7 @@ export default tseslint.config(
       ...importFlatConfigs.typescript.rules,
       'complexity': 'off',
       'sonarjs/cognitive-complexity': 'off',
+      'sonarjs/function-return-type': 'off',
       'sonarjs/void-use': 'off',
       'import/no-unresolved': 'off',
       'no-restricted-imports': [

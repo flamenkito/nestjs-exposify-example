@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStateService } from '../services/auth-state.service';
+import { AuthStateService } from '../auth/auth-state.service';
 
 @Component({
   selector: 'app-layout',

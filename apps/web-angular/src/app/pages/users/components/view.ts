@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AuthStateService } from '~/app/services/auth-state.service';
+import { AuthStateService } from '~/app/auth/auth-state.service';
 import { LayoutComponent } from '~/app/shared/layout.component';
 import { UsersService } from '~/generated';
 import { UserListComponent } from './user-list.component';
