@@ -1,11 +1,11 @@
 // @ts-check
-import path from 'node:path';
 import eslint from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
-const { flatConfigs: importFlatConfigs } = importPlugin;
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
+import path from 'node:path';
 import tseslint from 'typescript-eslint';
+const { flatConfigs: importFlatConfigs } = importPlugin;
 
 // Custom plugin for warn-level restricted syntax patterns
 const customRulesPlugin = {
@@ -118,8 +118,7 @@ const customRulesPlugin = {
 
             // Check if it's a simple relative path (./ or ../ but not ../../)
             const isSimpleRelative =
-              relativePath.startsWith('./') ||
-              (relativePath.startsWith('../') && !relativePath.startsWith('../../'));
+              relativePath.startsWith('./') || (relativePath.startsWith('../') && !relativePath.startsWith('../../'));
 
             if (isSimpleRelative) {
               context.report({
@@ -173,8 +172,8 @@ export default tseslint.config(
     },
     rules: {
       ...importFlatConfigs.typescript.rules,
-      'complexity': 'off',
-      'sonarjs/cognitive-complexity': 'off',
+      'complexity': 'error',
+      'sonarjs/cognitive-complexity': 'error',
       'sonarjs/function-return-type': 'off',
       'sonarjs/void-use': 'off',
       'import/no-unresolved': 'off',

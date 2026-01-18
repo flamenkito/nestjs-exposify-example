@@ -18,11 +18,19 @@ function getButtonText(isLoading: boolean, isEditing: boolean): string {
   return isEditing ? 'Save' : 'Create';
 }
 
-interface UserFormProps {
-  readonly user: User | undefined;
+interface CreateModeProps {
+  readonly mode: 'create';
 }
 
-export function UserForm({ user }: UserFormProps) {
+interface EditModeProps {
+  readonly mode: 'edit';
+  readonly user: User;
+}
+
+type UserFormProps = CreateModeProps | EditModeProps;
+
+export function UserForm(props: UserFormProps) {
+  const user = props.mode === 'edit' ? props.user : null;
   const name = useSignal(user ? user.name : '');
   const email = useSignal(user ? user.email : '');
   const formError = useSignal<string | null>(null);

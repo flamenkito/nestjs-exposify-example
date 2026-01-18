@@ -39,10 +39,10 @@ function renderTableBody(): JSX.Element {
 
 function renderDetailPanel() {
   if (showCreateForm.value) {
-    return <UserForm user={undefined} />;
+    return <UserForm mode="create" />;
   }
   if (editing.value && selectedUser.value) {
-    return <UserForm user={selectedUser.value} />;
+    return <UserForm mode="edit" user={selectedUser.value} />;
   }
   if (selectedUser.value) {
     return <UserCard user={selectedUser.value} />;
