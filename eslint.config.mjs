@@ -175,7 +175,7 @@ export default tseslint.config(
       'complexity': 'error',
       'sonarjs/cognitive-complexity': 'error',
       'sonarjs/function-return-type': 'off',
-      'sonarjs/void-use': 'off',
+      'sonarjs/void-use': 'error',
       'import/no-unresolved': 'off',
       'no-restricted-imports': [
         'error',
