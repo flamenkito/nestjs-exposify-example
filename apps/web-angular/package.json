@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "ng serve --port 3002 --proxy-config proxy.conf.json",
-    "build": "ng build"
+    "build": "ng build --base-href=/angular/"
   },
   "dependencies": {
     "@example/utils": "*",

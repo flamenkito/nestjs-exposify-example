@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AuthService, AuthUser, LoginDto, Role } from '../../generated';
+import { AuthService, AuthUser, LoginDto, Role } from '~/generated';
 
 @Injectable({ providedIn: 'root' })
 export class AuthStateService {

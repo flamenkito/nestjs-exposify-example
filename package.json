@@ -13,6 +13,7 @@
     "dev": "workgraph watch api web-angular web-preact",
     "build": "workgraph build",
     "start:prod": "bun run --filter '@example/api' start:prod",
+    "lint": "eslint libs apps",
     "format": "prettier --write \"apps/**/*.{ts,tsx,css,html}\" \"libs/**/*.ts\"",
     "clean": "rm -rf dist apps/*/dist apps/*/src/generated libs/*/dist"
   },

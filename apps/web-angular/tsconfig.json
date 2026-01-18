@@ -1,6 +1,10 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["src/*"]
+    },
     "outDir": "./dist/out-tsc",
     "skipLibCheck": true,
     "isolatedModules": true,

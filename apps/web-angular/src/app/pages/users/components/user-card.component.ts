@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { UserDto } from '../../../../generated';
+import { UserDto } from '~/generated';
 
 @Component({
   selector: 'app-user-card',

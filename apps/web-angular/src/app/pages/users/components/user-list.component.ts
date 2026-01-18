@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { byId } from '@example/utils';
-import { UserDto, UsersService } from '../../../../generated';
+import { UserDto, UsersService } from '~/generated';
 import { UserCardComponent } from './user-card.component';
 import { UserFormComponent } from './user-form.component';
 

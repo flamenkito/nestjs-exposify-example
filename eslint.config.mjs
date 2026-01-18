@@ -1,7 +1,9 @@
 // @ts-check
+import path from 'node:path';
 import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import importPlugin from 'eslint-plugin-import';
+const { flatConfigs: importFlatConfigs } = importPlugin;
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
 import tseslint from 'typescript-eslint';
 
@@ -75,6 +77,63 @@ const customRulesPlugin = {
         };
       },
     },
+    'prefer-relative-imports': {
+      meta: {
+        type: 'suggestion',
+        docs: {
+          description: 'Prefer ./ or ../ imports over ~/ when target is nearby',
+        },
+        fixable: 'code',
+        schema: [],
+      },
+      create(context) {
+        const filename = context.filename || context.getFilename();
+        const fileDir = path.dirname(filename);
+
+        // Find the src directory by looking for it in the path
+        const srcMatch = fileDir.match(/^(.+?\/src)(\/|$)/);
+        if (!srcMatch) return {};
+
+        const srcDir = srcMatch[1];
+
+        return {
+          ImportDeclaration(node) {
+            const importPath = node.source.value;
+            if (typeof importPath !== 'string' || !importPath.startsWith('~/')) return;
+
+            // Convert ~/ path to absolute path
+            const relativePart = importPath.slice(2); // Remove ~/
+            const absoluteTarget = path.join(srcDir, relativePart);
+
+            // Calculate relative path from current file to target
+            let relativePath = path.relative(fileDir, absoluteTarget);
+
+            // Normalize to use forward slashes
+            relativePath = relativePath.replace(/\\/g, '/');
+
+            // Add ./ prefix if needed
+            if (!relativePath.startsWith('.')) {
+              relativePath = './' + relativePath;
+            }
+
+            // Check if it's a simple relative path (./ or ../ but not ../../)
+            const isSimpleRelative =
+              relativePath.startsWith('./') ||
+              (relativePath.startsWith('../') && !relativePath.startsWith('../../'));
+
+            if (isSimpleRelative) {
+              context.report({
+                node: node.source,
+                message: `Use relative import '${relativePath}' instead of '${importPath}'.`,
+                fix(fixer) {
+                  return fixer.replaceText(node.source, `'${relativePath}'`);
+                },
+              });
+            }
+          },
+        };
+      },
+    },
   },
 };
 
@@ -107,14 +166,28 @@ export default tseslint.config(
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
+    ...importFlatConfigs.typescript,
     plugins: {
-      import: importPlugin,
+      ...importFlatConfigs.typescript.plugins,
       custom: customRulesPlugin,
     },
     rules: {
-      complexity: 'off',
+      ...importFlatConfigs.typescript.rules,
+      'complexity': 'off',
       'sonarjs/cognitive-complexity': 'off',
       'sonarjs/void-use': 'off',
+      'import/no-unresolved': 'off',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../../*', '../../../*', '../../../../*'],
+              message: 'Use path alias ~/ instead of deep relative imports.',
+            },
+          ],
+        },
+      ],
       'import/no-useless-path-segments': ['error', { noUselessIndex: true }],
       'import/newline-after-import': ['error', { count: 1 }],
       'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: false }],
@@ -154,6 +227,7 @@ export default tseslint.config(
       ],
       'custom/no-explicit-null-undefined': 'warn',
       'custom/no-fallback-defaults': 'warn',
+      'custom/prefer-relative-imports': 'error',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },

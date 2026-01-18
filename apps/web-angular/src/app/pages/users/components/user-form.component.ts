@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
-import { UserDto, UsersService } from '../../../../generated';
-import { SignalInputDirective } from '../../../shared/signal-input.directive';
+import { SignalInputDirective } from '~/app/shared/signal-input.directive';
+import { UserDto, UsersService } from '~/generated';
 
 @Component({
   selector: 'app-user-form',
