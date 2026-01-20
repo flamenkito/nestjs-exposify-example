@@ -225,7 +225,7 @@ import { Public } from '@example/auth';
 import { Permissions } from './auth.config';  // Use typed decorator
 
 @Injectable()
-export class MyService {
+export class MyApi {
   @Public()  // No auth required
   async publicMethod() { ... }
 
