@@ -4,34 +4,35 @@ import { Expose } from 'nestjs-exposify';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Permissions } from '../auth';
-import { CreateUserDto, IdDto, UpdateUserDto, UserDto } from './user.dto';
+import { CreateUserDto, IdDto, UpdateUserDto } from './user.dto';
 import { UserEntity } from './user.entity';
+import { asUserResource, UserResource } from './user.resource';
 
 @Expose({ transport: 'json-rpc' })
 @Injectable()
-export class UsersService {
+export class UsersFacade {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   @Permissions('user:read')
-  async getUsers(): Promise<UserDto[]> {
+  async getUsers(): Promise<UserResource[]> {
     const users = await this.userRepository.find();
-    return users.map(({ id, name, email }) => ({ id, name, email }));
+    return users.map(asUserResource);
   }
 
   @Permissions('user:read')
-  async getUserById(dto: IdDto): Promise<UserDto> {
+  async getUserById(dto: IdDto): Promise<UserResource> {
     const user = await this.userRepository.findOneBy({ id: dto.id });
     if (!user) {
       throw new NotFoundException(`User with id ${dto.id} not found`);
     }
-    return { id: user.id, name: user.name, email: user.email };
+    return asUserResource(user);
   }
 
   @Permissions('user:create')
-  async createUser(dto: CreateUserDto): Promise<UserDto> {
+  async createUser(dto: CreateUserDto): Promise<UserResource> {
     const newUser = this.userRepository.create({
       id: uuidv4(),
       name: dto.name,
@@ -40,11 +41,11 @@ export class UsersService {
       role: 'user',
     });
     const saved = await this.userRepository.save(newUser);
-    return { id: saved.id, name: saved.name, email: saved.email };
+    return asUserResource(saved);
   }
 
   @Permissions('user:update')
-  async updateUser(dto: UpdateUserDto): Promise<UserDto> {
+  async updateUser(dto: UpdateUserDto): Promise<UserResource> {
     const user = await this.userRepository.findOneBy({ id: dto.id });
     if (!user) {
       throw new NotFoundException(`User with id ${dto.id} not found`);
@@ -52,7 +53,7 @@ export class UsersService {
     user.name = dto.name;
     user.email = dto.email;
     const saved = await this.userRepository.save(user);
-    return { id: saved.id, name: saved.name, email: saved.email };
+    return asUserResource(saved);
   }
 
   @Permissions('user:delete')

@@ -1,8 +1,8 @@
-import type { UserDto } from '../generated/models';
+import type { UserResource } from '../generated/models';
 import { deleteUser, deleting, startEditing } from '../hooks/useJsonRpc';
 
 interface UserCardProps {
-  readonly user: UserDto;
+  readonly user: UserResource;
 }
 
 const EditIcon = () => (
@@ -48,8 +48,8 @@ export function UserCard({ user }: UserCardProps) {
 
   return (
     <div class="user-card">
-      <h3>{user.name}</h3>
-      <p>{user.email}</p>
+      <h3>{user.attributes.name}</h3>
+      <p>{user.attributes.email}</p>
       <p class="id">{user.id}</p>
       <div class="card-actions">
         <button class="edit-btn" onClick={startEditing}>

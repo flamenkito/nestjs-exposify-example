@@ -5,14 +5,6 @@ export class IdDto {
   id: string;
 }
 
-export class UserDto {
-  id: string;
-
-  name: string;
-
-  email: string;
-}
-
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()

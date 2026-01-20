@@ -1,6 +1,6 @@
 import { byId } from '@example/utils';
 import { computed, signal } from '@preact/signals';
-import type { AuthUser, Role, UserDto } from '../generated';
+import type { AuthUser, Role, UserResource } from '../generated';
 import { setAuthToken } from '../generated';
 import {
   createUser as apiCreateUser,
@@ -52,10 +52,10 @@ export function logout(): void {
 }
 
 // Users state
-export const users = signal<UserDto[]>([]);
+export const users = signal<UserResource[]>([]);
 export const loading = signal(false);
 export const error = signal<string | null>(null);
-export const selectedUser = signal<UserDto | null>(null);
+export const selectedUser = signal<UserResource | null>(null);
 export const showCreateForm = signal(false);
 export const editing = signal(false);
 export const deleting = signal(false);
@@ -72,7 +72,7 @@ export async function fetchUsers(): Promise<void> {
   }
 }
 
-export async function createUser(name: string, email: string): Promise<UserDto | null> {
+export async function createUser(name: string, email: string): Promise<UserResource | null> {
   loading.value = true;
   error.value = null;
   try {
@@ -87,7 +87,7 @@ export async function createUser(name: string, email: string): Promise<UserDto |
   }
 }
 
-export async function updateUser(id: string, name: string, email: string): Promise<UserDto | null> {
+export async function updateUser(id: string, name: string, email: string): Promise<UserResource | null> {
   loading.value = true;
   error.value = null;
   try {
@@ -118,7 +118,7 @@ export async function deleteUser(id: string): Promise<boolean> {
   }
 }
 
-export function selectUser(user: UserDto | null): void {
+export function selectUser(user: UserResource | null): void {
   if (selectedUser.value?.id === user?.id) {
     selectedUser.value = null;
   } else {

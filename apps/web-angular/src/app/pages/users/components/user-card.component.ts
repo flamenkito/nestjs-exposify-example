@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { UserDto } from '~/generated';
+import { UserResource } from '~/generated';
 
 @Component({
   selector: 'app-user-card',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="user-card">
-      <h3>{{ user().name }}</h3>
-      <p>{{ user().email }}</p>
+      <h3>{{ user().attributes.name }}</h3>
+      <p>{{ user().attributes.email }}</p>
       <p class="id">{{ user().id }}</p>
       <div class="card-actions">
         <button class="edit-btn" (click)="edit.emit()">
@@ -51,7 +51,7 @@ import { UserDto } from '~/generated';
   `,
 })
 export class UserCardComponent {
-  user = input.required<UserDto>();
+  user = input.required<UserResource>();
 
   deleting = input(false);
 

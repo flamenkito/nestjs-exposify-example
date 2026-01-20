@@ -29,8 +29,8 @@ function renderTableBody(): JSX.Element {
     <>
       {users.value.map((user) => (
         <tr key={user.id} class={selectedUser.value?.id === user.id ? 'selected' : ''} onClick={() => selectUser(user)}>
-          <td>{user.name}</td>
-          <td>{user.email}</td>
+          <td>{user.attributes.name}</td>
+          <td>{user.attributes.email}</td>
         </tr>
       ))}
     </>

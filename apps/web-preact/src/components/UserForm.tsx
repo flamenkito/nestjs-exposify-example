@@ -9,7 +9,7 @@ import {
   stopEditing,
   updateUser,
 } from '../hooks/useJsonRpc';
-import type { User } from '../types/user';
+import type { UserResource } from '../generated';
 
 function getButtonText(isLoading: boolean, isEditing: boolean): string {
   if (isLoading) {
@@ -24,21 +24,21 @@ interface CreateModeProps {
 
 interface EditModeProps {
   readonly mode: 'edit';
-  readonly user: User;
+  readonly user: UserResource;
 }
 
 type UserFormProps = CreateModeProps | EditModeProps;
 
 export function UserForm(props: UserFormProps) {
   const user = props.mode === 'edit' ? props.user : null;
-  const name = useSignal(user ? user.name : '');
-  const email = useSignal(user ? user.email : '');
+  const name = useSignal(user ? user.attributes.name : '');
+  const email = useSignal(user ? user.attributes.email : '');
   const formError = useSignal<string | null>(null);
 
   // Update form when user prop changes
   useEffect(() => {
-    name.value = user ? user.name : '';
-    email.value = user ? user.email : '';
+    name.value = user ? user.attributes.name : '';
+    email.value = user ? user.attributes.email : '';
     formError.value = null;
   }, [user?.id]);
 

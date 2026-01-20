@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { SignalInputDirective } from '~/app/shared/signal-input.directive';
-import { UserDto, UsersService } from '~/generated';
+import { UserResource, UsersFacade } from '~/generated';
 
 @Component({
   selector: 'app-user-form',
@@ -23,9 +23,9 @@ import { UserDto, UsersService } from '~/generated';
   `,
 })
 export class UserFormComponent {
-  private readonly usersService = inject(UsersService);
+  private readonly usersFacade = inject(UsersFacade);
 
-  user = input<UserDto>();
+  user = input<UserResource>();
 
   created = output<void>();
 
@@ -41,8 +41,8 @@ export class UserFormComponent {
     effect(() => {
       const u = this.user();
       if (u) {
-        this.name.set(u.name);
-        this.email.set(u.email);
+        this.name.set(u.attributes.name);
+        this.email.set(u.attributes.email);
       }
     });
   }
@@ -58,8 +58,8 @@ export class UserFormComponent {
 
     const u = this.user();
     const request$ = u
-      ? this.usersService.updateUser({ id: u.id, name: nameVal, email: emailVal })
-      : this.usersService.createUser({ name: nameVal, email: emailVal });
+      ? this.usersFacade.updateUser({ id: u.id, name: nameVal, email: emailVal })
+      : this.usersFacade.createUser({ name: nameVal, email: emailVal });
 
     request$.subscribe({
       next: () => {

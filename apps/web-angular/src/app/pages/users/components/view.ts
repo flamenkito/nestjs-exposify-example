@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, resource, signal } from '@a
 import { firstValueFrom } from 'rxjs';
 import { AuthStateService } from '~/app/auth/auth-state.service';
 import { LayoutComponent } from '~/app/shared/layout.component';
-import { UsersService } from '~/generated';
+import { UsersFacade } from '~/generated';
 import { UserListComponent } from './user-list.component';
 
 @Component({
@@ -67,13 +67,13 @@ import { UserListComponent } from './user-list.component';
 export class View {
   readonly auth = inject(AuthStateService);
 
-  private readonly usersService = inject(UsersService);
+  private readonly usersFacade = inject(UsersFacade);
 
   showCreateForm = signal(false);
 
   usersResource = resource({
     params: () => (this.auth.isAuthenticated() ? {} : undefined),
-    loader: () => firstValueFrom(this.usersService.getUsers()),
+    loader: () => firstValueFrom(this.usersFacade.getUsers()),
   });
 
   onUserCreated() {

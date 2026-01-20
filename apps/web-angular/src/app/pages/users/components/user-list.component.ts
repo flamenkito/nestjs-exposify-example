@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { byId } from '@example/utils';
-import { UserDto, UsersService } from '~/generated';
+import { UserResource, UsersFacade } from '~/generated';
 import { UserCardComponent } from './user-card.component';
 import { UserFormComponent } from './user-form.component';
 
@@ -30,8 +30,8 @@ import { UserFormComponent } from './user-form.component';
             } @else {
               @for (user of users(); track user.id) {
                 <tr [class.selected]="isSelected(user)" (click)="selectUser(user)">
-                  <td>{{ user.name }}</td>
-                  <td>{{ user.email }}</td>
+                  <td>{{ user.attributes.name }}</td>
+                  <td>{{ user.attributes.email }}</td>
                 </tr>
               }
             }
@@ -55,9 +55,9 @@ import { UserFormComponent } from './user-form.component';
   `,
 })
 export class UserListComponent {
-  private readonly usersService = inject(UsersService);
+  private readonly usersFacade = inject(UsersFacade);
 
-  users = input<UserDto[] | undefined>();
+  users = input<UserResource[] | undefined>();
 
   loading = input(false);
 
@@ -69,7 +69,7 @@ export class UserListComponent {
 
   userSelected = output<void>();
 
-  selectedUser = signal<UserDto | null>(null);
+  selectedUser = signal<UserResource | null>(null);
 
   deleting = signal(false);
 
@@ -83,12 +83,12 @@ export class UserListComponent {
     });
   }
 
-  isSelected(user: UserDto): boolean {
+  isSelected(user: UserResource): boolean {
     const selected = this.selectedUser();
     return selected !== null && byId(selected.id)(user);
   }
 
-  selectUser(user: UserDto) {
+  selectUser(user: UserResource) {
     if (this.isSelected(user)) {
       this.selectedUser.set(null);
     } else {
@@ -112,7 +112,7 @@ export class UserListComponent {
     if (!user) return;
 
     this.deleting.set(true);
-    this.usersService.deleteUser({ id: user.id }).subscribe({
+    this.usersFacade.deleteUser({ id: user.id }).subscribe({
       next: () => {
         this.deleting.set(false);
         this.selectedUser.set(null);

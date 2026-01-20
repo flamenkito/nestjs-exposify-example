@@ -1,0 +1,27 @@
+{
+  "name": "@example/json-api",
+  "version": "0.0.1",
+  "description": "JSON:API decorators and serialization for TypeORM entities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "json-api-codegen": "./codegen/cli.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "peerDependencies": {
+    "reflect-metadata": "^0.2.0"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "glob": "^11.0.1",
+    "ts-morph": "^25.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "reflect-metadata": "^0.2.0",
+    "typescript": "^5.7.3"
+  }
+}
