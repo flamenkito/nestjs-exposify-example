@@ -8,6 +8,9 @@
     "build": "tsc",
     "dev": "tsc --watch"
   },
+  "dependencies": {
+    "@example/utils": "*"
+  },
   "peerDependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/jwt": "^11.0.0"

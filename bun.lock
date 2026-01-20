@@ -16,10 +16,10 @@
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-prettier": "^5.2.2",
         "eslint-plugin-sonarjs": "^3.0.5",
-        "exposify-codegen": "file:../exposify-codegen",
+        "exposify-codegen": "^0.0.4",
         "prettier": "^3.4.2",
         "prettier-plugin-organize-imports": "^4.3.0",
-        "workgraph": "file:../workgraph",
+        "workgraph": "^0.0.9",
       },
     },
     "apps/api": {
@@ -27,6 +27,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@example/auth": "*",
+        "@example/json-api": "*",
         "@example/utils": "*",
         "@nestjs/common": "^11.0.1",
         "@nestjs/core": "^11.0.1",
@@ -106,6 +107,9 @@
     "libs/auth": {
       "name": "@example/auth",
       "version": "0.0.1",
+      "dependencies": {
+        "@example/utils": "*",
+      },
       "devDependencies": {
         "@nestjs/common": "^11.0.0",
         "@nestjs/jwt": "^11.0.0",
@@ -1529,7 +1533,7 @@
 
     "exponential-backoff": ["exponential-backoff@3.1.3", "", {}, "sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA=="],
 
-    "exposify-codegen": ["exposify-codegen@file:../exposify-codegen", { "dependencies": { "commander": "^12.0.0", "glob": "^10.0.0", "ts-morph": "^24.0.0" }, "devDependencies": { "@types/node": "^22.10.7", "typescript": "^5.7.3" }, "bin": { "exposify-codegen": "dist/cli.js" } }],
+    "exposify-codegen": ["exposify-codegen@0.0.4", "", { "dependencies": { "commander": "^12.0.0", "glob": "^10.0.0", "ts-morph": "^24.0.0" }, "bin": { "exposify-codegen": "dist/cli.js" } }, "sha512-WmJndMlmJnhL5JLaa7pRvO9OpMAXbzzzCD1Q/f1YdU2zarp/XBOSaCdRT1Fkt/+IFuKgCm0/kRDoBdqw7xsldw=="],
 
     "express": ["express@5.2.1", "", { "dependencies": { "accepts": "^2.0.0", "body-parser": "^2.2.1", "content-disposition": "^1.0.0", "content-type": "^1.0.5", "cookie": "^0.7.1", "cookie-signature": "^1.2.1", "debug": "^4.4.0", "depd": "^2.0.0", "encodeurl": "^2.0.0", "escape-html": "^1.0.3", "etag": "^1.8.1", "finalhandler": "^2.1.0", "fresh": "^2.0.0", "http-errors": "^2.0.0", "merge-descriptors": "^2.0.0", "mime-types": "^3.0.0", "on-finished": "^2.4.1", "once": "^1.4.0", "parseurl": "^1.3.3", "proxy-addr": "^2.0.7", "qs": "^6.14.0", "range-parser": "^1.2.1", "router": "^2.2.0", "send": "^1.1.0", "serve-static": "^2.2.0", "statuses": "^2.0.1", "type-is": "^2.0.1", "vary": "^1.1.2" } }, "sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw=="],
 
@@ -2679,7 +2683,7 @@
 
     "wordwrap": ["wordwrap@1.0.0", "", {}, "sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q=="],
 
-    "workgraph": ["workgraph@file:../workgraph", { "dependencies": { "@types/blessed": "^0.1.27", "blessed": "^0.1.81", "chokidar": "^3.6.0", "commander": "^12.0.0", "glob": "^10.0.0" }, "devDependencies": { "@eslint/js": "^9.18.0", "@types/node": "^22.10.7", "eslint": "^9.18.0", "eslint-plugin-import": "^2.31.0", "eslint-plugin-sonarjs": "^3.0.2", "typescript": "^5.7.3", "typescript-eslint": "^8.21.0" }, "bin": { "workgraph": "dist/cli.js" } }],
+    "workgraph": ["workgraph@0.0.9", "", { "dependencies": { "@types/blessed": "^0.1.27", "blessed": "^0.1.81", "chokidar": "^3.6.0", "commander": "^12.0.0", "glob": "^10.0.0" }, "bin": { "workgraph": "dist/cli.js" } }, "sha512-ZC18WRY4gjEerjZdyYWaThNYPtJzh2z9BwVQFKQ7+LlcPB1PvX7oaqLOt/DPgbG3wAQ293Lw8SuEVW0XXkv/fQ=="],
 
     "wrap-ansi": ["wrap-ansi@9.0.2", "", { "dependencies": { "ansi-styles": "^6.2.1", "string-width": "^7.0.0", "strip-ansi": "^7.1.0" } }, "sha512-42AtmgqjV+X1VpdOfyTGOYRi0/zsoLqtXQckTmqTeybT+BDIbM/Guxo7x3pE2vtpr1ok6xRqM9OpBe+Jyoqyww=="],
 

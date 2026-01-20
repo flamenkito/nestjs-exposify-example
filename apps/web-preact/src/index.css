@@ -7,6 +7,7 @@
   /* Background colors */
   --color-bg: #f5f5f5;
   --color-bg-card: #ffffff;
+  --color-bg-input: #ffffff;
   --color-bg-secondary: #eeeeee;
   --color-bg-secondary-hover: #dddddd;
 
@@ -23,6 +24,8 @@
   --color-disabled: #cccccc;
   --color-error: #c62828;
   --color-error-bg: #ffebee;
+  --color-edit-hover: #b2dfdb;
+  --color-delete-hover: #ffcdd2;
 
   /* Shadows */
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -31,6 +34,42 @@
   /* Spacing */
   --radius-sm: 4px;
   --radius-md: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Primary colors - brighter for dark mode */
+    --color-primary: #26c6da;
+    --color-primary-hover: #4dd0e1;
+    --color-primary-light: #1a3a3d;
+
+    /* Background colors */
+    --color-bg: #121212;
+    --color-bg-card: #1e1e1e;
+    --color-bg-input: #2a2a2a;
+    --color-bg-secondary: #2a2a2a;
+    --color-bg-secondary-hover: #333333;
+
+    /* Text colors */
+    --color-text: #e0e0e0;
+    --color-text-secondary: #a0a0a0;
+    --color-text-muted: #707070;
+
+    /* Border colors */
+    --color-border: #3a3a3a;
+    --color-border-light: #2a2a2a;
+
+    /* State colors */
+    --color-disabled: #505050;
+    --color-error: #ef5350;
+    --color-error-bg: #2d1a1a;
+    --color-edit-hover: #234d4f;
+    --color-delete-hover: #3d2222;
+
+    /* Shadows - more subtle in dark mode */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
 }
 
 * {
@@ -174,7 +213,7 @@ h1 {
 }
 
 .edit-btn:hover {
-  background: #b2dfdb;
+  background: var(--color-edit-hover);
 }
 
 .delete-btn {
@@ -183,7 +222,7 @@ h1 {
 }
 
 .delete-btn:hover {
-  background: #ffcdd2;
+  background: var(--color-delete-hover);
 }
 
 .delete-btn:disabled {
@@ -203,6 +242,8 @@ h1 {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 14px;
+  background: var(--color-bg-input);
+  color: var(--color-text);
 }
 
 .create-form button {
@@ -240,6 +281,8 @@ h1 {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 14px;
+  background: var(--color-bg-input);
+  color: var(--color-text);
 }
 
 .form-row input:focus {
@@ -385,10 +428,22 @@ button.icon-only svg {
   margin-left: -9px;
 }
 
+.brand-logo,
+.login-logo {
+  border-radius: var(--radius-md);
+}
+
 .brand-logo {
   width: 56px;
   height: 56px;
   object-fit: contain;
+}
+
+@media (prefers-color-scheme: dark) {
+  .brand-logo,
+  .login-logo {
+    filter: invert(0.88) hue-rotate(180deg);
+  }
 }
 
 .user-info {
@@ -443,6 +498,8 @@ button.icon-only svg {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-size: 14px;
+  background: var(--color-bg-input);
+  color: var(--color-text);
 }
 
 .form-group input:focus {

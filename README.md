@@ -8,6 +8,7 @@
 
 Example monorepo demonstrating [nestjs-exposify](https://github.com/flamenkito/nestjs-exposify) library usage with Preact and Angular frontends. Includes:
 - Reusable JWT authentication library with permission-based RBAC
+- JSON:API resource code generation from TypeORM entities
 - Client generation via [exposify-codegen](https://github.com/flamenkito/exposify-codegen)
 - Preact UI that consumes the JSON-RPC API
 - Angular 21 UI (zoneless, signal forms) that consumes the JSON-RPC API
@@ -15,7 +16,7 @@ Example monorepo demonstrating [nestjs-exposify](https://github.com/flamenkito/n
 ## Installation
 
 ```bash
-npm install
+bun install
 ```
 
 ## Running the app
@@ -25,23 +26,24 @@ npm install
 Use [workgraph](https://github.com/flamenkito/workgraph) for coordinated builds with file watching:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 This will:
-1. Build library dependencies (`@example/auth`, `@example/utils`)
-2. Generate typed clients for Angular and Preact via [exposify-codegen](https://github.com/flamenkito/exposify-codegen)
-3. Start all dev servers with hot reload
+1. Build library dependencies (`@example/json-api`, `@example/utils`, `@example/auth`)
+2. Run source generators (JSON:API resources, typed clients)
+3. Build `@example/api`
+4. Start all dev servers with hot reload
 
 - http://localhost:3000 - API
 - http://localhost:3001/preact/ - Preact UI (hot reload)
-- http://localhost:3002 - Angular UI (hot reload)
+- http://localhost:3002/angular - Angular UI (hot reload)
 
 ### Production
 
 ```bash
-npm run build
-npm run start:prod
+bun run build
+bun run start:prod
 ```
 
 - http://localhost:3000/preact - Preact UI
@@ -153,6 +155,15 @@ curl -X POST http://localhost:3000/rpc/v1 \
 │   │   │   ├── permissions.decorator.ts # @Permissions()
 │   │   │   └── index.ts
 │   │   └── package.json
+│   ├── json-api/               # JSON:API decorators & codegen
+│   │   ├── src/
+│   │   │   ├── attribute.decorator.ts  # @Attribute()
+│   │   │   └── index.ts
+│   │   ├── codegen/            # Resource DTO generator
+│   │   │   ├── cli.ts
+│   │   │   ├── parser.ts
+│   │   │   └── generator.ts
+│   │   └── package.json
 │   └── utils/                  # Shared utilities
 │       ├── src/
 │       │   ├── by-id.ts            # byId predicate helper
@@ -246,18 +257,29 @@ This project uses [exposify-codegen](https://github.com/flamenkito/exposify-code
 
 ### Automatic Generation
 
-The `workgraph.sources` configuration in `package.json` automatically regenerates clients when the API changes:
+Source generators are configured per-project in each app's `package.json`. Generators automatically target their containing project and run before that project builds.
 
+**API** (`apps/api/package.json`) - generates JSON:API resource DTOs:
 ```json
 {
   "workgraph": {
     "sources": {
-      "apps/web-angular/src/generated": {
-        "command": "npx exposify-codegen api --output ./apps/web-angular/src/generated --target angular",
-        "deps": ["api"]
-      },
-      "apps/web-preact/src/generated": {
-        "command": "npx exposify-codegen api --output ./apps/web-preact/src/generated --target preact",
+      "api": {
+        "command": "bun run ../../libs/json-api/codegen/cli.ts --output src/generated",
+        "deps": []
+      }
+    }
+  }
+}
+```
+
+**Angular** (`apps/web-angular/package.json`):
+```json
+{
+  "workgraph": {
+    "sources": {
+      "web-angular": {
+        "command": "exposify-codegen api --output ./src/generated --target angular",
         "deps": ["api"]
       }
     }
@@ -265,7 +287,26 @@ The `workgraph.sources` configuration in `package.json` automatically regenerate
 }
 ```
 
-When you run `npm run build` or `npm run dev`, workgraph builds dependencies first, then runs the codegen commands before starting the dev servers.
+**Preact** (`apps/web-preact/package.json`):
+```json
+{
+  "workgraph": {
+    "sources": {
+      "web-preact": {
+        "command": "exposify-codegen api --output ./src/generated --target preact",
+        "deps": ["api"]
+      }
+    }
+  }
+}
+```
+
+When you run `bun run dev`, workgraph:
+1. Builds library dependencies (`@example/json-api`, `@example/utils`, `@example/auth`)
+2. Runs `api` generator → creates `apps/api/src/generated/`
+3. Builds `@example/api`
+4. Runs `web-angular` and `web-preact` generators
+5. Starts all dev servers
 
 ### Manual Generation
 

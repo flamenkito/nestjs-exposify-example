@@ -6,6 +6,14 @@
     "dev": "ng serve --port 3002 --proxy-config proxy.conf.json",
     "build": "ng build --base-href=/angular/"
   },
+  "workgraph": {
+    "sources": {
+      "web-angular": {
+        "command": "exposify-codegen api --output ./src/generated --target angular",
+        "deps": ["api"]
+      }
+    }
+  },
   "dependencies": {
     "@example/utils": "*",
     "@angular/common": "^21.0.0",

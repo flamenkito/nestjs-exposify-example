@@ -2,6 +2,14 @@
   "name": "@example/api",
   "version": "0.0.1",
   "private": true,
+  "workgraph": {
+    "sources": {
+      "api": {
+        "command": "bun run ../../libs/json-api/codegen/cli.ts --output src/generated",
+        "deps": []
+      }
+    }
+  },
   "scripts": {
     "build": "nest build",
     "dev": "nest start --watch",
@@ -16,6 +24,7 @@
   },
   "dependencies": {
     "@example/auth": "*",
+    "@example/json-api": "*",
     "@example/utils": "*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",

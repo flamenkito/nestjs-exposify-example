@@ -1,12 +1,22 @@
 #!/usr/bin/env bun
 import { program } from 'commander';
 import { glob } from 'glob';
+import { resolve } from 'node:path';
 import { generateResources } from './generator';
 import { createProject, parseEntityFile } from './parser';
 import type { EntityMetadata } from './types';
 
-const runCodegen = async (sourceGlob: string): Promise<void> => {
+interface CodegenOptions {
+  output?: string;
+  watch: boolean;
+}
+
+const runCodegen = async (
+  sourceGlob: string,
+  options: CodegenOptions,
+): Promise<void> => {
   const cwd = process.cwd();
+  const outputDir = options.output ? resolve(cwd, options.output) : undefined;
 
   console.log(`Scanning for entities: ${sourceGlob}`);
 
@@ -41,7 +51,7 @@ const runCodegen = async (sourceGlob: string): Promise<void> => {
 
   console.log(`\nGenerating ${allEntities.length} resource file(s)`);
 
-  const resourceFiles = generateResources(allEntities);
+  const resourceFiles = generateResources(allEntities, outputDir);
 
   console.log('\nGenerated files:');
   for (const file of resourceFiles) {
@@ -51,14 +61,17 @@ const runCodegen = async (sourceGlob: string): Promise<void> => {
   console.log('\nCode generation complete!');
 };
 
+const DEFAULT_GLOB = 'src/**/*.entity.ts';
+
 program
   .name('json-api-codegen')
   .description('Generate JSON:API resource DTOs from TypeORM entities')
-  .argument('<source-glob>', 'Glob pattern for entity files')
+  .argument('[source-glob]', 'Glob pattern for entity files', DEFAULT_GLOB)
+  .option('-o, --output <path>', 'Output directory for generated files')
   .option('-w, --watch', 'Watch mode for development', false)
-  .action(async (sourceGlob: string, options: { watch: boolean }) => {
+  .action(async (sourceGlob: string, options: CodegenOptions) => {
     try {
-      await runCodegen(sourceGlob);
+      await runCodegen(sourceGlob, options);
 
       if (options.watch) {
         console.log('\nWatch mode not yet implemented. Run manually for now.');

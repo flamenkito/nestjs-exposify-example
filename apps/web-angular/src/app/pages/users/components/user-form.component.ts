@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { SignalInputDirective } from '~/app/shared/signal-input.directive';
-import { UserResource, UsersFacade } from '~/generated';
+import { UserResource, UsersApi } from '~/generated';
 
 @Component({
   selector: 'app-user-form',
@@ -23,7 +23,7 @@ import { UserResource, UsersFacade } from '~/generated';
   `,
 })
 export class UserFormComponent {
-  private readonly usersFacade = inject(UsersFacade);
+  private readonly usersFacade = inject(UsersApi);
 
   user = input<UserResource>();
 

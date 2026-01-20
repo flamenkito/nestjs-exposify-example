@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { byId } from '@example/utils';
-import { UserResource, UsersFacade } from '~/generated';
+import { UserResource, UsersApi } from '~/generated';
 import { UserCardComponent } from './user-card.component';
 import { UserFormComponent } from './user-form.component';
 
@@ -55,7 +55,7 @@ import { UserFormComponent } from './user-form.component';
   `,
 })
 export class UserListComponent {
-  private readonly usersFacade = inject(UsersFacade);
+  private readonly usersFacade = inject(UsersApi);
 
   users = input<UserResource[] | undefined>();
 

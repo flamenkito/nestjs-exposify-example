@@ -13,7 +13,8 @@ const generateImports = (
   const lines: string[] = [];
 
   // Import the entity type
-  lines.push(`import type { ${entity.name}Entity } from './${entity.resourceType}.entity';`);
+  const entityPath = entity.entityImportPath ?? `./${entity.resourceType}.entity`;
+  lines.push(`import type { ${entity.name}Entity } from '${entityPath}';`);
 
   for (const imp of imports) {
     const typePrefix = imp.isTypeOnly ? 'type ' : '';

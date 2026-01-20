@@ -6,11 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { Permissions } from '../auth';
 import { CreateUserDto, IdDto, UpdateUserDto } from './user.dto';
 import { UserEntity } from './user.entity';
-import { asUserResource, UserResource } from './user.resource';
+import { asUserResource, UserResource } from '../generated';
 
 @Expose({ transport: 'json-rpc' })
 @Injectable()
-export class UsersFacade {
+export class UsersApi {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,

@@ -24,6 +24,7 @@ export interface EntityMetadata {
   attributes: PropertyMetadata[];
   relationships: RelationshipPropertyMetadata[];
   imports: ImportMetadata[];
+  entityImportPath?: string;
 }
 
 export interface CodegenOptions {
