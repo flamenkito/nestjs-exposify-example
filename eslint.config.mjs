@@ -4,7 +4,7 @@ import importPlugin from 'eslint-plugin-import';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import sonarjs from 'eslint-plugin-sonarjs';
 import path from 'node:path';
-import tseslint from 'typescript-eslint';
+import typescriptEsLint from 'typescript-eslint';
 const { flatConfigs: importFlatConfigs } = importPlugin;
 
 // Custom plugin for warn-level restricted syntax patterns
@@ -136,7 +136,7 @@ const customRulesPlugin = {
   },
 };
 
-export default tseslint.config(
+export default typescriptEsLint.config(
   {
     ignores: [
       '**/dist',
@@ -152,7 +152,7 @@ export default tseslint.config(
     ],
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...typescriptEsLint.configs.recommendedTypeChecked,
   sonarjs.configs.recommended,
   eslintPluginPrettierRecommended,
   {
