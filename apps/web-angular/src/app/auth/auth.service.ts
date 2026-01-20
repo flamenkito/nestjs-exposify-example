@@ -1,10 +1,10 @@
 import { computed, inject, Injectable, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AuthService, AuthUser, LoginDto, Role } from '~/generated';
+import { AuthApi, AuthUser, LoginDto, Role } from '~/generated';
 
 @Injectable({ providedIn: 'root' })
-export class AuthStateService {
-  private readonly authService = inject(AuthService);
+export class AuthService {
+  private readonly authApi = inject(AuthApi);
 
   readonly token = signal<string | null>(localStorage.getItem('token'));
 
@@ -20,7 +20,7 @@ export class AuthStateService {
     params: () => this.loginRequest(),
     loader: async ({ params }) => {
       if (!params) return undefined;
-      const result = await firstValueFrom(this.authService.login(params));
+      const result = await firstValueFrom(this.authApi.login(params));
       this.token.set(result.accessToken);
       this.currentUser.set(result.user);
       localStorage.setItem('token', result.accessToken);

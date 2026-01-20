@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStateService } from '~/app/auth/auth-state.service';
+import { AuthService } from '~/app/auth/auth.service';
 import { SignalInputDirective } from '~/app/shared/signal-input.directive';
 
 @Component({
@@ -37,7 +37,7 @@ import { SignalInputDirective } from '~/app/shared/signal-input.directive';
 export class View {
   private readonly router = inject(Router);
 
-  readonly auth = inject(AuthStateService);
+  readonly auth = inject(AuthService);
 
   email = signal('admin@example.com');
 

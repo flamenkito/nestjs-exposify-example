@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, resource, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AuthStateService } from '~/app/auth/auth-state.service';
+import { AuthService } from '~/app/auth/auth.service';
 import { LayoutComponent } from '~/app/shared/layout.component';
 import { UsersApi } from '~/generated';
 import { UserListComponent } from './user-list.component';
@@ -65,7 +65,7 @@ import { UserListComponent } from './user-list.component';
   `,
 })
 export class View {
-  readonly auth = inject(AuthStateService);
+  readonly auth = inject(AuthService);
 
   private readonly usersApi = inject(UsersApi);
 

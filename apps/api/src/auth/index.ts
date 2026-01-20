@@ -3,4 +3,4 @@ export type { AuthResponse, AuthUser, JwtPayload } from '@example/auth';
 export * from './auth.config';
 export * from './auth.dto';
 export * from './auth.module';
-export * from './auth.service';
+export * from './auth.api';

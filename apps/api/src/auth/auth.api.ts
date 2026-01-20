@@ -12,7 +12,7 @@ import { LoginDto, RegisterDto } from './auth.dto';
 
 @Expose({ transport: 'json-rpc' })
 @Injectable()
-export class AuthService {
+export class AuthApi {
   constructor(
     private jwtService: JwtService,
     @InjectRepository(UserEntity)

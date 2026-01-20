@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { AuthStateService } from './auth-state.service';
+import { AuthService } from './auth.service';
 
 export const authGuard = (): boolean | UrlTree => {
-  const auth = inject(AuthStateService);
+  const auth = inject(AuthService);
   const router = inject(Router);
 
   if (auth.isAuthenticated()) {

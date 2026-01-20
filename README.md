@@ -65,7 +65,7 @@ JWT-based authentication with role permissions provided by `@example/auth` libra
 ```bash
 curl -X POST http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","method":"AuthService.login","params":{"email":"admin@example.com","password":"password"},"id":1}'
+  -d '{"jsonrpc":"2.0","method":"AuthApi.login","params":{"email":"admin@example.com","password":"password"},"id":1}'
 ```
 
 Response:
@@ -88,7 +88,7 @@ TOKEN="eyJhbG..."
 curl -X POST http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"jsonrpc":"2.0","method":"UsersService.getUsers","id":1}'
+  -d '{"jsonrpc":"2.0","method":"UsersApi.getUsers","id":1}'
 ```
 
 ## Testing the JSON-RPC endpoint
@@ -97,20 +97,20 @@ curl -X POST http://localhost:3000/rpc/v1 \
 # Login and get token
 TOKEN=$(curl -s http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","method":"AuthService.login","params":{"email":"admin@example.com","password":"password"},"id":1}' \
+  -d '{"jsonrpc":"2.0","method":"AuthApi.login","params":{"email":"admin@example.com","password":"password"},"id":1}' \
   | grep -o '"accessToken":"[^"]*"' | cut -d'"' -f4)
 
 # Get all users (requires user:read)
 curl -X POST http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"jsonrpc":"2.0","method":"UsersService.getUsers","id":1}'
+  -d '{"jsonrpc":"2.0","method":"UsersApi.getUsers","id":1}'
 
 # Create user (requires user:create - admin only)
 curl -X POST http://localhost:3000/rpc/v1 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"jsonrpc":"2.0","method":"UsersService.createUser","params":{"name":"Alice","email":"alice@example.com"},"id":2}'
+  -d '{"jsonrpc":"2.0","method":"UsersApi.createUser","params":{"name":"Alice","email":"alice@example.com"},"id":2}'
 ```
 
 ## Project Structure

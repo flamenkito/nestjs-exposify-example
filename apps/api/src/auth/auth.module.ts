@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../users/user.entity';
 import { ROLE_PERMISSIONS } from './auth.config';
-import { AuthService } from './auth.service';
+import { AuthApi } from './auth.api';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { AuthService } from './auth.service';
       rolePermissions: ROLE_PERMISSIONS,
     }),
   ],
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [AuthApi],
+  exports: [AuthApi],
 })
 export class AuthModule {}

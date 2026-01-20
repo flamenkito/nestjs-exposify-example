@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthStateService } from '../auth/auth-state.service';
+import { AuthService } from '../auth/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -49,7 +49,7 @@ import { AuthStateService } from '../auth/auth-state.service';
 export class LayoutComponent {
   private readonly router = inject(Router);
 
-  readonly auth = inject(AuthStateService);
+  readonly auth = inject(AuthService);
 
   title = input('');
 
