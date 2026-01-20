@@ -18,6 +18,7 @@
     "clean": "rm -rf dist apps/*/dist apps/*/src/generated libs/*/dist"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.2.2",
@@ -44,6 +45,9 @@
     }
   },
   "dependencies": {
-    "neverthrow": "^8.2.0"
+    "@nestjs/typeorm": "^11.0.0",
+    "better-sqlite3": "^12.6.2",
+    "neverthrow": "^8.2.0",
+    "typeorm": "^0.3.28"
   }
 }

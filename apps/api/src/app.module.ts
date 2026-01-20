@@ -4,6 +4,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { JsonRpcModule } from 'nestjs-exposify';
 import { join } from 'path';
 import { AuthModule } from './auth';
+import { DatabaseModule } from './database';
 import { DelayInterceptor } from './delay.interceptor';
 import { UsersModule } from './users';
 
@@ -13,6 +14,7 @@ const DEFAULT_SPA_PATH = WEB_ANGULAR_PATH;
 
 @Module({
   imports: [
+    DatabaseModule,
     AuthModule,
     UsersModule,
     JsonRpcModule,

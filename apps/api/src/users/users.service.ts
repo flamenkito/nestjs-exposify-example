@@ -1,54 +1,65 @@
-import { byId, required } from '@example/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Expose } from 'nestjs-exposify';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Permissions } from '../auth';
 import { CreateUserDto, IdDto, UpdateUserDto, UserDto } from './user.dto';
-
-const users: UserDto[] = [
-  { id: uuidv4(), name: 'John Doe', email: 'john@example.com' },
-  { id: uuidv4(), name: 'Jane Smith', email: 'jane@example.com' },
-  { id: uuidv4(), name: 'Bob Johnson', email: 'bob@example.com' },
-];
+import { UserEntity } from './user.entity';
 
 @Expose({ transport: 'json-rpc' })
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
+
   @Permissions('user:read')
-  getUsers(): UserDto[] {
-    return users;
+  async getUsers(): Promise<UserDto[]> {
+    const users = await this.userRepository.find();
+    return users.map(({ id, name, email }) => ({ id, name, email }));
   }
 
   @Permissions('user:read')
-  getUserById(dto: IdDto): UserDto {
-    return users.find(byId(dto.id)) ?? required(`user with id ${dto.id}`, NotFoundException);
+  async getUserById(dto: IdDto): Promise<UserDto> {
+    const user = await this.userRepository.findOneBy({ id: dto.id });
+    if (!user) {
+      throw new NotFoundException(`User with id ${dto.id} not found`);
+    }
+    return { id: user.id, name: user.name, email: user.email };
   }
 
   @Permissions('user:create')
-  createUser(dto: CreateUserDto): UserDto {
-    const newUser: UserDto = {
+  async createUser(dto: CreateUserDto): Promise<UserDto> {
+    const newUser = this.userRepository.create({
       id: uuidv4(),
       name: dto.name,
       email: dto.email,
-    };
-    users.push(newUser);
-    return newUser;
+      passwordHash: '',
+      role: 'user',
+    });
+    const saved = await this.userRepository.save(newUser);
+    return { id: saved.id, name: saved.name, email: saved.email };
   }
 
   @Permissions('user:update')
-  updateUser(dto: UpdateUserDto): UserDto {
-    const user = users.find(byId(dto.id)) ?? required(`user with id ${dto.id}`, NotFoundException);
+  async updateUser(dto: UpdateUserDto): Promise<UserDto> {
+    const user = await this.userRepository.findOneBy({ id: dto.id });
+    if (!user) {
+      throw new NotFoundException(`User with id ${dto.id} not found`);
+    }
     user.name = dto.name;
     user.email = dto.email;
-    return user;
+    const saved = await this.userRepository.save(user);
+    return { id: saved.id, name: saved.name, email: saved.email };
   }
 
   @Permissions('user:delete')
-  deleteUser(dto: IdDto): void {
-    const index = users.findIndex(byId(dto.id));
-    if (index === -1) {
-      required(`user with id ${dto.id}`, NotFoundException);
+  async deleteUser(dto: IdDto): Promise<void> {
+    const result = await this.userRepository.delete({ id: dto.id });
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with id ${dto.id} not found`);
     }
-    users.splice(index, 1);
   }
 }

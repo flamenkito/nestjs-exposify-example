@@ -1,52 +1,27 @@
 import { AuthResponse, AuthUser, Public } from '@example/auth';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Expose } from 'nestjs-exposify';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { UserEntity } from '../users/user.entity';
 import { Role } from './auth.config';
 import { LoginDto, RegisterDto } from './auth.dto';
-
-// Password: "password"
-// eslint-disable-next-line sonarjs/no-hardcoded-passwords
-const passwordHash = '$2b$10$1mt58fwdDw3YvdWY5c.z0OhPjr2IrVS1LeNythMesdeY3lmUmSt/y';
-
-interface StoredUser {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  role: Role;
-}
-
-// In-memory user storage
-const users: StoredUser[] = [
-  {
-    id: uuidv4(),
-    name: 'Admin',
-    email: 'admin@example.com',
-    // Password: "password"
-    passwordHash,
-    role: 'admin',
-  },
-  {
-    id: uuidv4(),
-    name: 'User',
-    email: 'user@example.com',
-    // Password: "password"
-    passwordHash,
-    role: 'user',
-  },
-];
 
 @Expose({ transport: 'json-rpc' })
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+  ) {}
 
   @Public()
   async login(dto: LoginDto): Promise<AuthResponse<Role>> {
-    const user = users.find((u) => u.email === dto.email);
+    const user = await this.userRepository.findOneBy({ email: dto.email });
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -74,22 +49,22 @@ export class AuthService {
 
   @Public()
   async register(dto: RegisterDto): Promise<AuthResponse<Role>> {
-    const existingUser = users.find((u) => u.email === dto.email);
+    const existingUser = await this.userRepository.findOneBy({ email: dto.email });
 
     if (existingUser) {
       throw new UnauthorizedException('Email already registered');
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
-    const newUser: StoredUser = {
+    const newUser = this.userRepository.create({
       id: uuidv4(),
       name: dto.name,
       email: dto.email,
       passwordHash,
       role: 'user',
-    };
+    });
 
-    users.push(newUser);
+    await this.userRepository.save(newUser);
 
     const payload = { sub: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role };
     const accessToken = await this.jwtService.signAsync(payload);
